@@ -549,7 +549,7 @@
         <div class="flex items-center gap-3">
           <div class="flex items-center gap-2.5">
             <i id="headerIcon" class="fa-solid fa-chart-pie text-teal-600 text-base"></i>
-            <h2 id="pageTitle" class="text-teal-950 font-black text-xs md:text-sm uppercase tracking-wider">DASHBOARD</h2>
+            <h2 id="pageTitle" class="text-teal-950 font-black text-xs md:text-sm uppercase tracking-wider">HOME</h2>
           </div>
           <span class="text-slate-300">|</span>
           <button type="button" id="tabBtnInbox" onclick="pindahMenu('inbox')" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-200 text-[11px] font-extrabold uppercase tracking-wider transition cursor-pointer shadow-sm">
@@ -572,6 +572,10 @@
           <button type="button" id="tabBtnKaldik" onclick="pindahMenu('kaldik')" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-900 border border-rose-200 text-[11px] font-extrabold uppercase tracking-wider transition cursor-pointer shadow-sm">
             <i class="fa-solid fa-calendar-days text-rose-600"></i>
             <span>Kalender</span>
+          </button>
+          <button type="button" id="tabBtnDaftar" onclick="pindahMenu('daftar')" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-violet-50 hover:bg-violet-100 text-violet-900 border border-violet-200 text-[11px] font-extrabold uppercase tracking-wider transition cursor-pointer shadow-sm">
+            <i class="fa-solid fa-user-plus text-violet-600"></i>
+            <span>Daftar</span>
           </button>
         </div>
         <div class="flex items-center gap-3">
@@ -2272,7 +2276,7 @@
                   <button type="button" onclick="window.pindahBulanKaldik && window.pindahBulanKaldik(1)" class="w-9 h-9 rounded-full text-slate-500 hover:bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-chevron-right text-sm"></i></button>
                 </div>
                 <select id="filterKaldikView" onchange="window.gantiViewKaldik && window.gantiViewKaldik(this.value)" class="text-[11px] font-bold border border-slate-300 rounded-lg px-2.5 py-1.5 bg-white text-slate-700 outline-none focus:border-teal-500 cursor-pointer shadow-sm">
-                  <option value="semua">Tampilkan Semua (Jul 2026 – Jun 2027)</option>
+                  <option value="semua">Tampilkan Semua Bulan</option>
                   <option value="2026-7">Juli 2026</option>
                   <option value="2026-8">Agustus 2026</option>
                   <option value="2026-9">September 2026</option>
@@ -2306,6 +2310,293 @@
               <p id="kaldikHint" class="text-center text-[10px] text-slate-400 px-3 py-2 hidden border-t border-slate-100 m-0"><i class="fa-solid fa-pen-to-square"></i> Mode edit aktif: klik tanggal untuk mengubah agenda &amp; rundown.</p>
             </div>
           </section>
+
+          <!-- ========================================== -->
+          <!-- 12F. PANEL: DAFTAR CALON SANTRI BARU       -->
+          <!-- ========================================== -->
+          <section id="panelDaftar" class="w-full hidden animate-[fadeIn_0.3s_ease-in-out]">
+            <div class="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden flex flex-col h-[calc(100vh-4.5rem)]">
+              <!-- Header -->
+              <div class="bg-gradient-to-r from-violet-900 to-violet-700 px-5 py-2.5 flex justify-between items-center text-white shrink-0">
+                <div class="flex items-center gap-2.5">
+                  <i class="fa-solid fa-user-plus text-violet-200"></i>
+                  <div>
+                    <h3 class="font-black text-xs uppercase tracking-wider">Pendaftaran Santri Baru</h3>
+                    <p class="text-[9px] text-violet-200 font-medium">Sumber Data Dari Google Spreadsheet</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button onclick="muatDaftarSantriBaru(true)" class="px-2.5 py-1 rounded-lg bg-white/15 hover:bg-white/25 text-[10px] font-bold uppercase tracking-wider transition cursor-pointer flex items-center gap-1.5">
+                    <i class="fa-solid fa-rotate"></i> Refresh
+                  </button>
+                  <button onclick="exportDaftarExcel()" class="px-2.5 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-[10px] font-bold uppercase tracking-wider transition cursor-pointer flex items-center gap-1.5">
+                    <i class="fa-solid fa-file-excel"></i> Excel
+                  </button>
+                </div>
+              </div>
+
+              <!-- Stat Cards -->
+              <div class="grid grid-cols-2 md:grid-cols-5 gap-2 p-3 bg-slate-50 border-b border-slate-200 shrink-0">
+                <div class="bg-white rounded-lg border border-slate-200 px-3 py-2 flex items-center gap-2 shadow-sm">
+                  <div class="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center shrink-0"><i class="fa-solid fa-users text-violet-600 text-sm"></i></div>
+                  <div><p class="text-[8px] font-bold text-slate-400 uppercase tracking-wider">Total</p><p id="statDaftarTotal" class="text-sm font-black text-slate-800 leading-tight">-</p></div>
+                </div>
+                <div class="bg-white rounded-lg border border-slate-200 px-3 py-2 flex items-center gap-2 shadow-sm">
+                  <div class="w-8 h-8 rounded-lg bg-sky-100 flex items-center justify-center shrink-0"><i class="fa-solid fa-graduation-cap text-sky-600 text-sm"></i></div>
+                  <div><p class="text-[8px] font-bold text-slate-400 uppercase tracking-wider">Ulya (SMA)</p><p id="statDaftarUlya" class="text-sm font-black text-slate-800 leading-tight">-</p></div>
+                </div>
+                <div class="bg-white rounded-lg border border-slate-200 px-3 py-2 flex items-center gap-2 shadow-sm">
+                  <div class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center shrink-0"><i class="fa-solid fa-school text-amber-600 text-sm"></i></div>
+                  <div><p class="text-[8px] font-bold text-slate-400 uppercase tracking-wider">Wustha (SMP)</p><p id="statDaftarWustha" class="text-sm font-black text-slate-800 leading-tight">-</p></div>
+                </div>
+                <div class="bg-white rounded-lg border border-slate-200 px-3 py-2 flex items-center gap-2 shadow-sm">
+                  <div class="w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center shrink-0"><i class="fa-solid fa-mars text-teal-600 text-sm"></i></div>
+                  <div><p class="text-[8px] font-bold text-slate-400 uppercase tracking-wider">Laki-laki</p><p id="statDaftarLk" class="text-sm font-black text-slate-800 leading-tight">-</p></div>
+                </div>
+                <div class="bg-white rounded-lg border border-slate-200 px-3 py-2 flex items-center gap-2 shadow-sm">
+                  <div class="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center shrink-0"><i class="fa-solid fa-venus text-rose-600 text-sm"></i></div>
+                  <div><p class="text-[8px] font-bold text-slate-400 uppercase tracking-wider">Perempuan</p><p id="statDaftarPr" class="text-sm font-black text-slate-800 leading-tight">-</p></div>
+                </div>
+              </div>
+
+              <!-- Toolbar Filter -->
+              <div class="flex flex-wrap items-center gap-2 px-4 py-2 border-b border-slate-200 bg-white shrink-0">
+                <div class="relative flex-1 min-w-[180px]">
+                  <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                  <input id="cariDaftar" oninput="renderTabelDaftar()" type="text" placeholder="Cari nama, alamat, no HP..." class="w-full pl-8 pr-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-xs focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400">
+                </div>
+                <select id="filterJenjangDaftar" onchange="renderTabelDaftar()" class="px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-violet-300 cursor-pointer">
+                  <option value="">Semua Jenjang</option>
+                </select>
+                <select id="filterJkDaftar" onchange="renderTabelDaftar()" class="px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-violet-300 cursor-pointer">
+                  <option value="">Semua JK</option>
+                  <option value="Laki-laki">Laki-laki</option>
+                  <option value="Perempuan">Perempuan</option>
+                </select>
+                <span id="infoJumlahDaftar" class="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-auto">- Pendaftar</span>
+              </div>
+
+              <!-- Tabel -->
+              <div class="flex-1 overflow-auto">
+                <table class="w-full text-xs border-collapse">
+                  <thead id="theadDaftar" class="sticky top-0 z-10 bg-violet-900 text-white"></thead>
+                  <tbody id="tbodyDaftar"></tbody>
+                </table>
+                <div id="pesanDaftar" class="p-6 text-center text-xs text-slate-400">Memuat data...</div>
+              </div>
+            </div>
+          </section>
+
+          <script>
+          /* =========================================================
+             PENDAFTARAN SANTRI BARU — tarik data dari Google Sheet
+             Cara kerja: Google Sheets menyediakan endpoint gviz (JSONP)
+             yang bisa dibaca browser tanpa server. Syaratnya sheet
+             harus di-share: "Siapa saja yang memiliki tautan dapat melihat".
+             Ubah 2 konstanta di bawah jika pindah sheet.
+             ========================================================= */
+          const DAFTAR_SHEET_ID = '1decCUDghl-EkFcU-OlhD3Db091DWZ1n9QKvmca-6Mjo';
+          const DAFTAR_GID      = '220961119'; // tab "Santri Baru"
+          let _daftarCols = [];   // [{idx, label, role}] kolom yang ditampilkan
+          let _daftarRows = [];   // array of array (seluruh baris)
+          let _daftarLoaded = false;
+
+          // Deteksi peran kolom dari isi datanya (robost terhadap kolom tersembunyi/ganti urutan)
+          function deteksiKolomDaftar(headers, rows) {
+            const cols = [];
+            let namaDipakai = false;
+            for (let c = 0; c < headers.length; c++) {
+              const sample = [];
+              for (let r = 0; r < Math.min(rows.length, 30); r++) {
+                const v = String(rows[r][c] || '').trim();
+                if (v) sample.push(v);
+              }
+              if (sample.length === 0) continue; // kolom kosong -> lewati
+              // kolom konstan (mis. "Santri Baru", "Tahfizh") -> lewati
+              const unik = [...new Set(sample)];
+              if (unik.length === 1) continue;
+
+              const gabung = sample.join(' | ');
+              let label = headers[c] || ('Kolom ' + (c + 1));
+              let role = 'lain';
+
+              if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(sample[0])) { label = 'Waktu Daftar'; role = 'waktu'; }
+              else if (sample.some(s => /^(Ulya|Wustha)/i.test(s.trim()))) { label = 'Jenjang'; role = 'jenjang'; }
+              else if (sample.every(s => /^[0-9+\s()-]{9,16}$/.test(s.replace(/\s/g,'')))) { label = 'No. HP'; role = 'hp'; }
+              else if (sample.every(s => /^(Lancar|Belum[ ]?Lancar)$/i.test(s.trim()))) { label = 'Hafalan'; role = 'hafalan'; }
+              else if (sample.every(s => /^(Perempuan|Laki[- ]?laki|Pria|Wanita)$/i.test(s.trim()))) { label = 'JK'; role = 'jk'; }
+              else if (sample.every(s => s.length > 18) && /(jalan|jl\.?|ds\.?|desa|kec\.?|kel\.?|dusun|rt|rw|link|gng|gunung|no\.?)/i.test(gabung)) { label = 'Alamat'; role = 'alamat'; }
+              else if (!namaDipakai && sample.every(s => s.length >= 3 && s.length <= 45 && !/^\d+$/.test(s))) { label = 'Nama'; role = 'nama'; namaDipakai = true; }
+
+              cols.push({ idx: c, label: label, role: role });
+            }
+            // urutkan: No, Waktu, Jenjang, Nama, Alamat, No.HP, Hafalan, JK, sisanya
+            const urutan = { 'no':0, 'waktu':1, 'jenjang':2, 'nama':3, 'alamat':4, 'hp':5, 'hafalan':6, 'jk':7, 'lain':9 };
+            cols.sort((a,b) => (urutan[a.role]||9) - (urutan[b.role]||9));
+            return cols;
+          }
+
+          function muatDaftarSantriBaru(paksa) {
+            if (_daftarLoaded && !paksa) { renderTabelDaftar(); return; }
+            const pesan = document.getElementById('pesanDaftar');
+            if (pesan) { pesan.textContent = 'Memuat data dari Google Spreadsheet...'; pesan.classList.remove('hidden'); }
+            const tbody = document.getElementById('tbodyDaftar');
+            if (tbody) tbody.innerHTML = '';
+
+            const cb = '___cbDaftar_' + Date.now();
+            let selesai = false;
+            window[cb] = function(resp) {
+              selesai = true;
+              try { delete window[cb]; } catch(e){}
+              const scr = document.getElementById('scrDaftarJsonp');
+              if (scr) scr.remove();
+              if (!resp || !resp.table) {
+                tampilkanErrorDaftar('Google Sheet tidak dapat dibaca. Pastikan sheet di-share ke "Siapa saja yang memiliki tautan dapat melihat".');
+                return;
+              }
+              const rawCols = resp.table.cols || [];
+              const headers = rawCols.map(function(col){ return (col && (col.label || col.id)) ? col.label || col.id : ''; });
+              const rows = (resp.table.rows || []).map(function(r){
+                return (r.c || []).map(function(cell){
+                  if (!cell) return '';
+                  return (cell.f !== undefined && cell.f !== null) ? String(cell.f) : String(cell.v !== null && cell.v !== undefined ? cell.v : '');
+                });
+              });
+              if (rows.length === 0) {
+                if (pesan) pesan.textContent = 'Belum ada data pendaftar di sheet.';
+                return;
+              }
+              _daftarCols = deteksiKolomDaftar(headers, rows);
+              _daftarRows = rows;
+              _daftarLoaded = true;
+              // isi dropdown jenjang
+              const selJ = document.getElementById('filterJenjangDaftar');
+              if (selJ) {
+                const jens = [];
+                const colJ = _daftarCols.find(c => c.role === 'jenjang');
+                if (colJ) rows.forEach(r => { const v = String(r[colJ.idx]||'').trim(); if (v && jens.indexOf(v)===-1) jens.push(v); });
+                jens.sort();
+                const cur = selJ.value;
+                selJ.innerHTML = '<option value="">Semua Jenjang</option>' + jens.map(j => '<option value="'+j+'">'+j+'</option>').join('');
+                selJ.value = cur;
+              }
+              renderTabelDaftar();
+            };
+            const scr = document.createElement('script');
+            scr.id = 'scrDaftarJsonp';
+            scr.src = 'https://docs.google.com/spreadsheets/d/' + DAFTAR_SHEET_ID + '/gviz/tq?tqx=out:json;responseHandler:' + cb + '&gid=' + DAFTAR_GID;
+            scr.onerror = function() {
+              if (selesai) return;
+              selesai = true;
+              tampilkanErrorDaftar('Gagal memuat. Periksa koneksi, atau pastikan Sheet ID & GID benar dan sheet di-share publik.');
+            };
+            document.head.appendChild(scr);
+            // timeout 12 detik
+            setTimeout(function(){ if (!selesai) { selesai = true; try { delete window[cb]; } catch(e){} if (scr) scr.remove(); tampilkanErrorDaftar('Timeout memuat data (12 detik). Pastikan sheet di-share publik.'); } }, 12000);
+          }
+
+          function tampilkanErrorDaftar(msg) {
+            const pesan = document.getElementById('pesanDaftar');
+            if (pesan) {
+              pesan.innerHTML = '<div class="max-w-md mx-auto bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-4 text-left"><p class="font-bold mb-1"><i class="fa-solid fa-triangle-exclamation"></i> ' + msg + '</p><ol class="list-decimal pl-4 mt-2 space-y-1 text-[11px]"><li>Buka spreadsheet, klik <b>Bagikan</b> (kanan atas).</li><li>Di bagian "Akses umum", pilih <b>"Siapa saja yang memiliki tautan dapat melihat"</b>.</li><li>Pastikan tab yang aktif adalah <b>"Santri Baru"</b> (gid=220961119).</li><li>Klik tombol <b>Refresh</b> di atas.</li></ol></div>';
+              pesan.classList.remove('hidden');
+            }
+            const tbody = document.getElementById('tbodyDaftar');
+            if (tbody) tbody.innerHTML = '';
+            const thead = document.getElementById('theadDaftar');
+            if (thead) thead.innerHTML = '';
+          }
+
+          function renderTabelDaftar() {
+            const thead = document.getElementById('theadDaftar');
+            const tbody = document.getElementById('tbodyDaftar');
+            const pesan = document.getElementById('pesanDaftar');
+            if (!thead || !tbody) return;
+
+            const cari = (document.getElementById('cariDaftar') || {}).value || '';
+            const fJ = (document.getElementById('filterJenjangDaftar') || {}).value || '';
+            const fJK = (document.getElementById('filterJkDaftar') || {}).value || '';
+            const colJ = _daftarCols.find(c => c.role === 'jenjang');
+            const colJK = _daftarCols.find(c => c.role === 'jk');
+
+            let rows = _daftarRows.slice();
+            if (cari) {
+              const q = cari.toLowerCase();
+              rows = rows.filter(r => r.some(cell => String(cell||'').toLowerCase().indexOf(q) !== -1));
+            }
+            if (fJ && colJ) rows = rows.filter(r => String(r[colJ.idx]||'').replace(/\s+/g,' ').trim() === fJ);
+            if (fJK && colJK) {
+              const kw = /laki/i.test(fJK) ? 'laki' : 'perempuan';
+              rows = rows.filter(r => String(r[colJK.idx]||'').toLowerCase().indexOf(kw) !== -1);
+            }
+
+            // header tabel
+            thead.innerHTML = '<tr><th class="px-2 py-2 text-center text-[10px] font-bold uppercase tracking-wider w-10">No</th>'
+              + _daftarCols.map(c => '<th class="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wider whitespace-nowrap">' + c.label + '</th>').join('')
+              + '</tr>';
+
+            if (rows.length === 0) {
+              tbody.innerHTML = '';
+              if (pesan) { pesan.textContent = 'Tidak ada data yang cocok dengan filter.'; pesan.classList.remove('hidden'); }
+            } else {
+              if (pesan) pesan.classList.add('hidden');
+              tbody.innerHTML = rows.map(function(r, i){
+                const colJK2 = _daftarCols.find(c => c.role === 'jk');
+                const jkVal = colJK2 ? String(r[colJK2.idx]||'').trim() : '';
+                const jkLow = String(jkVal||'').toLowerCase();
+                const warnaJK = /perempuan|wanita|perempu/i.test(jkLow) ? 'text-rose-600 font-semibold' : /laki|pria/i.test(jkLow) ? 'text-teal-700 font-semibold' : '';
+                return '<tr class="hover:bg-violet-50/60 transition border-b border-slate-100">'
+                  + '<td class="px-2 py-2 text-center text-[11px] font-bold text-slate-400">' + (i+1) + '</td>'
+                  + _daftarCols.map(function(c){
+                      let val = String(r[c.idx] || '').trim();
+                      let cls = 'px-3 py-2 text-[11px] text-slate-700';
+                      if (c.role === 'nama') cls += ' font-bold text-slate-900 whitespace-nowrap';
+                      if (c.role === 'jk') cls += ' ' + warnaJK;
+                      if (c.role === 'hp') cls += ' whitespace-nowrap';
+                      if (c.role === 'alamat') cls += ' text-slate-500 max-w-[280px]';
+                      if (c.role === 'hafalan') {
+                        cls += ' text-center font-bold whitespace-nowrap ' + (/^lancar$/i.test(val.trim()) ? 'text-emerald-600' : 'text-amber-600');
+                      }
+                      return '<td class="' + cls + '">' + (val || '-') + '</td>';
+                    }).join('')
+                  + '</tr>';
+              }).join('');
+            }
+
+            // statistik (hitung dari seluruh data, bukan filter) — cocokkan dengan keyword, toleran spasi
+            const hitung = function(role, keyword) {
+              const col = _daftarCols.find(c => c.role === role);
+              if (!col) return 0;
+              const k = keyword.toLowerCase();
+              return _daftarRows.filter(r => String(r[col.idx]||'').toLowerCase().indexOf(k) !== -1).length;
+            };
+            const setTeks = function(id, v) { const el = document.getElementById(id); if (el) el.textContent = v; };
+            setTeks('statDaftarTotal', _daftarRows.length);
+            setTeks('statDaftarUlya', hitung('jenjang', 'Ulya'));
+            setTeks('statDaftarWustha', hitung('jenjang', 'Wustha'));
+            setTeks('statDaftarLk', hitung('jk', 'Laki'));
+            setTeks('statDaftarPr', hitung('jk', 'Perempuan'));
+            const info = document.getElementById('infoJumlahDaftar');
+            if (info) info.textContent = rows.length + ' Pendaftar' + (rows.length !== _daftarRows.length ? ' / ' + _daftarRows.length + ' total' : '');
+          }
+
+          function exportDaftarExcel() {
+            if (!_daftarLoaded || _daftarRows.length === 0) {
+              Swal.fire({ title:'Belum ada data', text:'Muat data terlebih dahulu.', icon:'info', timer:1800, showConfirmButton:false });
+              return;
+            }
+            const header = ['No'].concat(_daftarCols.map(c => c.label));
+            const body = _daftarRows.map(function(r, i){
+              return [i+1].concat(_daftarCols.map(c => String(r[c.idx] || '')));
+            });
+            const ws = XLSX.utils.aoa_to_sheet([header].concat(body));
+            ws['!cols'] = header.map(() => ({ wch: 22 }));
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Santri Baru');
+            const tgl = new Date().toISOString().slice(0,10);
+            XLSX.writeFile(wb, 'Pendaftaran_Santri_Baru_' + tgl + '.xlsx');
+          }
+          </script>
 
 <!-- 12C. PANEL: ROSTER & MAPEL KBM             -->
           <!-- ========================================== -->
@@ -3359,7 +3650,7 @@
       const panels = [
         'panelBeranda', 'panelInputSoal', 'panelDaftarSoal', 'panelSettingSoal',
         'panelSetoran', 'panelInputKbm', 'panelNilaiKbm', 'panelAbsenKbm', 'panelAbsenKst', 'panelAdab',
-        'panelRekapKbm', 'panelRekapTahfizh', 'panelRekapNilai', 'panelRekapAbsenKbm', 'panelRekapAdab', 'panelRekapKinerja', 'panelCekInputNilai', 'panelRekapPrestasi', 'panelProfilData', 'panelRosterMapel', 'panelRankingKelas', 'panelKlasemenAdab', 'panelRekapTasmi', 'panelInputTasmi', 'panelCapaianTahfizh', 'panelBelumSetoran', 'panelDownload', 'panelInbox', 'panelUjian', 'panelKontrolUjian', 'panelKaldik'
+        'panelRekapKbm', 'panelRekapTahfizh', 'panelRekapNilai', 'panelRekapAbsenKbm', 'panelRekapAdab', 'panelRekapKinerja', 'panelCekInputNilai', 'panelRekapPrestasi', 'panelProfilData', 'panelRosterMapel', 'panelRankingKelas', 'panelKlasemenAdab', 'panelRekapTasmi', 'panelInputTasmi', 'panelCapaianTahfizh', 'panelBelumSetoran', 'panelDownload', 'panelInbox', 'panelUjian', 'panelKontrolUjian', 'panelKaldik', 'panelDaftar'
       ];
       panels.forEach(p => {
         const el = document.getElementById(p);
@@ -3369,7 +3660,7 @@
       const tabs = [
         'tabBtnBeranda', 'tabBtnInputSoal', 'tabBtnDaftarSoal', 'tabBtnSettingSoal',
         'tabBtnSetoran', 'tabBtnInputKbm', 'tabBtnNilaiKbm', 'tabBtnAbsenKbm', 'tabBtnAbsenKst', 'tabBtnAdab',
-        'tabBtnRekapKbm', 'tabBtnRekapTahfizh', 'tabBtnRekapNilai', 'tabBtnRekapAbsenKbm', 'tabBtnRekapAdab', 'tabBtnRekapKinerja', 'tabBtnCekInputNilai', 'tabBtnRekapPrestasi', 'tabBtnProfilData', 'tabBtnRosterMapel', 'tabBtnRankingKelas', 'tabBtnKlasemenAdab', 'tabBtnRekapTasmi', 'tabBtnInputTasmi', 'tabBtnCapaianTahfizh', 'tabBtnBelumSetoran', 'tabBtnDownload', 'tabBtnInbox', 'tabBtnUjian', 'tabBtnKontrolUjian', 'tabBtnKaldik'
+        'tabBtnRekapKbm', 'tabBtnRekapTahfizh', 'tabBtnRekapNilai', 'tabBtnRekapAbsenKbm', 'tabBtnRekapAdab', 'tabBtnRekapKinerja', 'tabBtnCekInputNilai', 'tabBtnRekapPrestasi', 'tabBtnProfilData', 'tabBtnRosterMapel', 'tabBtnRankingKelas', 'tabBtnKlasemenAdab', 'tabBtnRekapTasmi', 'tabBtnInputTasmi', 'tabBtnCapaianTahfizh', 'tabBtnBelumSetoran', 'tabBtnDownload', 'tabBtnInbox', 'tabBtnUjian', 'tabBtnKontrolUjian', 'tabBtnKaldik', 'tabBtnDaftar'
       ];
       tabs.forEach(t => {
         const el = document.getElementById(t);
@@ -3585,6 +3876,12 @@
         titleEl.innerText = 'KALENDER';
         iconEl.className = 'fa-solid fa-calendar-days text-rose-600 text-base';
         if (typeof window.muatKaldik === 'function') window.muatKaldik();
+      } else if (menu === 'daftar') {
+        document.getElementById('panelDaftar').classList.remove('hidden');
+        document.getElementById('tabBtnDaftar').classList.add('active');
+        titleEl.innerText = 'DAFTAR';
+        iconEl.className = 'fa-solid fa-user-plus text-violet-600 text-base';
+        if (typeof window.muatDaftarSantriBaru === 'function') window.muatDaftarSantriBaru();
       }
       
       mainScroll.scrollTop = 0;
