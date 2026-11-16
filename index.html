@@ -549,7 +549,7 @@
         <div class="flex items-center gap-3">
           <div class="flex items-center gap-2.5">
             <i id="headerIcon" class="fa-solid fa-chart-pie text-teal-600 text-base"></i>
-            <h2 id="pageTitle" class="text-teal-950 font-black text-xs md:text-sm uppercase tracking-wider">HOME</h2>
+            <h2 id="pageTitle" class="text-teal-950 font-black text-xs md:text-sm uppercase tracking-wider">DASHBOARD</h2>
           </div>
           <span class="text-slate-300">|</span>
           <button type="button" id="tabBtnInbox" onclick="pindahMenu('inbox')" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-200 text-[11px] font-extrabold uppercase tracking-wider transition cursor-pointer shadow-sm">
@@ -2321,13 +2321,19 @@
                 <div class="flex items-center gap-2.5">
                   <i class="fa-solid fa-user-plus text-violet-200"></i>
                   <div>
-                    <h3 class="font-black text-xs uppercase tracking-wider">Pendaftaran Santri Baru</h3>
-                    <p class="text-[9px] text-violet-200 font-medium">Sumber Data Dari Google Spreadsheet</p>
+                    <h3 class="font-black text-xs uppercase tracking-wider">Daftar</h3>
+                    <p class="text-[9px] text-violet-200 font-medium">Data langsung dari Google Spreadsheet Formulir Pendaftaran</p>
                   </div>
                 </div>
                 <div class="flex items-center gap-2">
+                  <button onclick="bukaModalForm()" class="px-3 py-1 rounded-lg bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white text-[10px] font-black uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center gap-1.5 shadow-md hover:shadow-lg hover:scale-105">
+                    <i class="fa-solid fa-pen-to-square"></i> Input
+                  </button>
                   <button onclick="muatDaftarSantriBaru(true)" class="px-2.5 py-1 rounded-lg bg-white/15 hover:bg-white/25 text-[10px] font-bold uppercase tracking-wider transition cursor-pointer flex items-center gap-1.5">
                     <i class="fa-solid fa-rotate"></i> Refresh
+                  </button>
+                  <button onclick="cetakDaftarPDF()" class="px-2.5 py-1 rounded-lg bg-sky-500 hover:bg-sky-600 text-white text-[10px] font-bold uppercase tracking-wider transition cursor-pointer flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-print"></i> Cetak/PDF
                   </button>
                   <button onclick="exportDaftarExcel()" class="px-2.5 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-[10px] font-bold uppercase tracking-wider transition cursor-pointer flex items-center gap-1.5">
                     <i class="fa-solid fa-file-excel"></i> Excel
@@ -2387,6 +2393,28 @@
             </div>
           </section>
 
+          <!-- Modal: Form Pendaftaran tertanam (embedded iframe) -->
+          <div id="modalFormDaftar" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target===this)tutupModalForm()">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl h-[92vh] flex flex-col overflow-hidden">
+              <div class="flex items-center justify-between px-5 py-3 bg-gradient-to-r from-violet-900 to-violet-700 text-white shrink-0">
+                <div class="flex items-center gap-2.5">
+                  <i class="fa-solid fa-pen-to-square text-violet-200"></i>
+                  <div>
+                    <h3 class="font-black text-xs uppercase tracking-wider">Formulir Pendaftaran Santri Baru</h3>
+                    <p class="text-[9px] text-violet-200">Isi langsung di sini — jawaban otomatis masuk ke spreadsheet</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <a href="#" onclick="event.preventDefault();window.open(FORM_PENDAFTARAN_URL,'_blank')" class="text-[9px] font-bold text-violet-200 hover:text-white underline">Buka di tab baru</a>
+                  <button onclick="tutupModalForm()" class="w-7 h-7 rounded-lg bg-white/15 hover:bg-white/30 flex items-center justify-center transition cursor-pointer" title="Tutup">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                  </button>
+                </div>
+              </div>
+              <iframe id="iframeFormDaftar" class="flex-1 w-full border-0 bg-white" src="about:blank"></iframe>
+            </div>
+          </div>
+
           <script>
           /* =========================================================
              PENDAFTARAN SANTRI BARU — tarik data dari Google Sheet
@@ -2397,6 +2425,8 @@
              ========================================================= */
           const DAFTAR_SHEET_ID = '1decCUDghl-EkFcU-OlhD3Db091DWZ1n9QKvmca-6Mjo';
           const DAFTAR_GID      = '220961119'; // tab "Santri Baru"
+          const TP_AKTIF        = '2027_2028'; // tahun pelajaran aktif (untuk nama file Excel)
+          const FORM_PENDAFTARAN_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfxztdK2g5HO4x_DsRDyyAcZ_kqhGYGFVd1JXk_JP5ckNcUjQ/viewform';
           let _daftarCols = [];   // [{idx, label, role}] kolom yang ditampilkan
           let _daftarRows = [];   // array of array (seluruh baris)
           let _daftarLoaded = false;
@@ -2589,12 +2619,101 @@
             const body = _daftarRows.map(function(r, i){
               return [i+1].concat(_daftarCols.map(c => String(r[c.idx] || '')));
             });
-            const ws = XLSX.utils.aoa_to_sheet([header].concat(body));
-            ws['!cols'] = header.map(() => ({ wch: 22 }));
+            const tp = TP_AKTIF.replace('_', '/');
+            const judul1 = 'DAFTAR CALON SANTRI BARU - TP. ' + tp;
+            const judul2 = 'PONDOK PESANTREN IBNUL JAUZY - KEC. BINJAI - KAB. LANGKAT';
+            const nCol = header.length;
+            const aoa = [[judul1], [judul2], [], header].concat(body);
+            const ws = XLSX.utils.aoa_to_sheet(aoa);
+            // merge judul & sub-judul sepanjang kolom
+            ws['!merges'] = [
+              { s:{r:0,c:0}, e:{r:0,c:nCol-1} },
+              { s:{r:1,c:0}, e:{r:1,c:nCol-1} }
+            ];
+            // lebar kolom disesuaikan isi
+            ws['!cols'] = header.map(function(hd, i){
+              if (i === 0) return { wch: 5 };
+              if (/alamat/i.test(hd)) return { wch: 45 };
+              if (/nama/i.test(hd)) return { wch: 28 };
+              if (/waktu/i.test(hd)) return { wch: 18 };
+              if (/hp|telp|telepon/i.test(hd)) return { wch: 16 };
+              if (/jenjang/i.test(hd)) return { wch: 14 };
+              return { wch: 13 };
+            });
+            // setup cetak: A4 landscape, muat 1 halaman lebar
+            ws['!pageSetup'] = { orientation: 'landscape', paperSize: 9, fitToWidth: 1, fitToHeight: 0 };
+            ws['!printOptions'] = { horizontalCentered: true };
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Santri Baru');
-            const tgl = new Date().toISOString().slice(0,10);
-            XLSX.writeFile(wb, 'Pendaftaran_Santri_Baru_' + tgl + '.xlsx');
+            const now = new Date();
+            const pad = function(n){ return String(n).padStart(2,'0'); };
+            const tglFile = pad(now.getDate()) + pad(now.getMonth()+1) + now.getFullYear();
+            const jamFile = pad(now.getHours()) + '.' + pad(now.getMinutes());
+            const namaFile = 'REKAP DAFTAR SANTRI BARU_TP.' + TP_AKTIF + '_' + tglFile + '_' + jamFile + '.xlsx';
+            XLSX.writeFile(wb, namaFile);
+          }
+
+          function bukaModalForm() {
+            const m = document.getElementById('modalFormDaftar');
+            const fr = document.getElementById('iframeFormDaftar');
+            if (!fr || fr.src.indexOf('embedded') === -1) fr.src = FORM_PENDAFTARAN_URL + '?embedded=true';
+            m.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+          }
+          function tutupModalForm() {
+            document.getElementById('modalFormDaftar').classList.add('hidden');
+            document.body.style.overflow = '';
+          }
+
+          function cetakDaftarPDF() {
+            if (!_daftarLoaded || _daftarRows.length === 0) {
+              Swal.fire({ title:'Belum ada data', text:'Muat data terlebih dahulu.', icon:'info', timer:1800, showConfirmButton:false });
+              return;
+            }
+            const header = ['No'].concat(_daftarCols.map(c => c.label));
+            const rows = _daftarRows.map(function(r, i){ return [i+1].concat(_daftarCols.map(c => String(r[c.idx] || ''))); });
+            const now = new Date();
+            const pad = function(n){ return String(n).padStart(2,'0'); };
+            const tglCetak = pad(now.getDate()) + '/' + pad(now.getMonth()+1) + '/' + now.getFullYear() + '  ' + pad(now.getHours()) + '.' + pad(now.getMinutes());
+            const tp = TP_AKTIF.replace('_', '/');
+
+            let h = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Daftar Calon Santri Baru</title>';
+            h += '<style>@page{size:A4 landscape;margin:1.1cm;}*{box-sizing:border-box;}body{font-family:Arial,Helvetica,sans-serif;color:#1e293b;margin:0;}';
+            h += '.kop{text-align:center;margin-bottom:6px;}.kop h1{font-size:17px;margin:0;letter-spacing:1.5px;color:#0f766e;}.kop h2{font-size:12px;margin:3px 0 0;font-weight:bold;letter-spacing:0.5px;}';
+            h += '.garis{border-bottom:3px double #0f766e;margin:8px 0 14px;}';
+            h += 'table{width:100%;border-collapse:collapse;font-size:9.5px;}';
+            h += 'th{background:#0f766e;color:#fff;padding:7px 6px;border:1px solid #0a443f;text-transform:uppercase;font-size:8px;letter-spacing:0.4px;}';
+            h += 'td{padding:5px 6px;border:1px solid #94a3b8;vertical-align:top;}tr:nth-child(even) td{background:#f0fdfa;}';
+            h += '.c-no{text-align:center;width:32px;font-weight:bold;color:#64748b;}.c-hp{white-space:nowrap;}.c-jk{text-align:center;font-weight:bold;}.c-haf{text-align:center;font-weight:bold;}';
+            h += '.meta{margin-top:12px;font-size:9px;color:#64748b;display:flex;justify-content:space-between;}';
+            h += '.ttd{margin-top:28px;display:flex;justify-content:flex-end;font-size:10px;}.ttd>div{text-align:center;width:210px;}.ttd .spasi{height:64px;}</style></head><body>';
+            h += '<div class="kop"><h1>DAFTAR CALON SANTRI BARU - TP. ' + tp + '</h1><h2>PONDOK PESANTREN IBNUL JAUZY - KEC. BINJAI - KAB. LANGKAT</h2></div>';
+            h += '<div class="garis"></div>';
+            h += '<table><thead><tr>' + header.map(function(hd, i){
+              let cls = '';
+              if (i === 0) cls = ' class="c-no"';
+              return '<th' + cls + '>' + hd + '</th>';
+            }).join('') + '</tr></thead><tbody>';
+            h += rows.map(function(r){
+              return '<tr>' + r.map(function(cell, i){
+                let cls = '';
+                if (i === 0) cls = ' class="c-no"';
+                else if (/no\.?\s*hp|telp/i.test(header[i])) cls = ' class="c-hp"';
+                else if (/jk|kelamin/i.test(header[i])) cls = ' class="c-jk"';
+                else if (/hafalan/i.test(header[i])) cls = ' class="c-haf"';
+                return '<td' + cls + '>' + cell + '</td>';
+              }).join('') + '</tr>';
+            }).join('');
+            h += '</tbody></table>';
+            h += '<div class="meta"><span><b>Total pendaftar: ' + _daftarRows.length + ' orang</b></span><span>Dicetak: ' + tglCetak + ' WIB</span></div>';
+            h += '<div class="ttd"><div>Mengetahui,<br>Panitia Penerimaan Santri Baru<div class="spasi"></div>(______________________)</div></div>';
+            h += '</body></html>';
+
+            const w = window.open('', '_blank');
+            w.document.write(h);
+            w.document.close();
+            w.focus();
+            setTimeout(function(){ w.print(); }, 600);
           }
           </script>
 
