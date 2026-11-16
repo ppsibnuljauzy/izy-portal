@@ -873,6 +873,11 @@
 
                       <div class="flex-1 flex flex-col min-h-0">
                         <label class="block text-[9px] font-bold text-slate-500 uppercase mb-0.5 shrink-0">Pertanyaannya</label>
+                        <div class="mb-1.5 shrink-0" data-scope="default">
+                          <button type="button" class="math-toggle-btn w-full flex items-center justify-center gap-1.5 px-2 py-1.5 bg-teal-600 border border-teal-700 rounded-md text-[9px] font-bold text-white uppercase tracking-wider hover:bg-teal-700 transition shadow-sm">
+                            <i class="fa-solid fa-square-root-variable"></i> Buka Menu Rumus &amp; Simbol Matematika <i class="fa-solid fa-up-right-from-square text-[8px] opacity-80"></i>
+                          </button>
+                        </div>
                         <textarea id="bsTeksSoal" placeholder="Tuliskan pertanyaan di sini..." required class="w-full flex-1 p-2 text-xs border border-slate-300 rounded-md focus:ring-1 focus:ring-teal-600 bg-white outline-none font-medium resize-none shadow-sm"></textarea>
                       </div>
 
@@ -894,9 +899,13 @@
                         <div class="space-y-2">
                           <div class="flex items-center gap-2"><span class="text-xs font-black text-teal-700 w-4">A.</span><input type="text" id="bsOptA" required placeholder="Opsi jawaban A..." class="w-full p-1.5 text-xs border border-slate-300 rounded-md bg-white outline-none focus:ring-1 focus:ring-teal-600 font-medium shadow-sm"></div>
                           <div class="flex items-center gap-2"><span class="text-xs font-black text-teal-700 w-4">B.</span><input type="text" id="bsOptB" required placeholder="Opsi jawaban B..." class="w-full p-1.5 text-xs border border-slate-300 rounded-md bg-white outline-none focus:ring-1 focus:ring-teal-600 font-medium shadow-sm"></div>
-                          <div class="flex items-center gap-2"><span class="text-xs font-black text-teal-700 w-4">C.</span><input type="text" id="bsOptC" required placeholder="Opsi jawaban C..." class="w-full p-1.5 text-xs border border-slate-300 rounded-md bg-white outline-none focus:ring-1 focus:ring-teal-600 font-medium shadow-sm"></div>
-                          <div class="flex items-center gap-2"><span class="text-xs font-black text-teal-700 w-4">D.</span><input type="text" id="bsOptD" required placeholder="Opsi jawaban D..." class="w-full p-1.5 text-xs border border-slate-300 rounded-md bg-white outline-none focus:ring-1 focus:ring-teal-600 font-medium shadow-sm"></div>
+                          <div class="flex items-center gap-2"><span class="text-xs font-black text-teal-700 w-4">C.</span><input type="text" id="bsOptC" placeholder="Opsi jawaban C (Opsional)..." class="w-full p-1.5 text-xs border border-slate-300 rounded-md bg-white outline-none focus:ring-1 focus:ring-teal-600 font-medium shadow-sm"></div>
+                          <div class="flex items-center gap-2"><span class="text-xs font-black text-teal-700 w-4">D.</span><input type="text" id="bsOptD" placeholder="Opsi jawaban D (Opsional)..." class="w-full p-1.5 text-xs border border-slate-300 rounded-md bg-white outline-none focus:ring-1 focus:ring-teal-600 font-medium shadow-sm"></div>
                           <div class="flex items-center gap-2"><span class="text-xs font-black text-teal-700 w-4">E.</span><input type="text" id="bsOptE" placeholder="Opsi jawaban E (Opsional)..." class="w-full p-1.5 text-xs border border-slate-300 rounded-md bg-white outline-none focus:ring-1 focus:ring-teal-600 font-medium shadow-sm"></div>
+                        </div>
+                        <div class="mt-2 px-2.5 py-1.5 rounded-md bg-amber-50 border border-amber-200 text-[9px] text-amber-800 font-bold flex items-center gap-1.5">
+                          <i class="fa-solid fa-circle-info text-amber-600 shrink-0"></i>
+                          <span><b class="uppercase">Wajib diisi:</b> Opsi A &amp; B. &nbsp;&nbsp;<b class="uppercase">Opsional:</b> C, D, dan E (boleh dikosongkan).</span>
                         </div>
                       </div>
                       <div class="pt-1">
@@ -1354,8 +1363,9 @@
                   </div>
 
                   <div class="md:col-span-3">
-                    <label class="block text-[9px] font-bold text-slate-500 uppercase mb-1">Judul Materi Pokok</label>
-                    <input type="text" id="kbmJudul" placeholder="Ketikkan judul materi..." required class="w-full p-2 text-xs border border-slate-300 rounded-md focus:ring-1 focus:ring-teal-600 outline-none font-semibold shadow-sm" />
+                    <label class="block text-[9px] font-bold text-slate-500 uppercase mb-1">Judul Materi Pokok <span class="text-teal-600 normal-case font-medium">(klik untuk melihat materi yang pernah diinput)</span></label>
+                    <input type="text" id="kbmJudul" list="kbmJudulList" placeholder="Ketikkan judul materi, atau klik untuk memilih dari materi sebelumnya..." required autocomplete="off" class="w-full p-2 text-xs border border-slate-300 rounded-md focus:ring-1 focus:ring-teal-600 outline-none font-semibold shadow-sm" />
+                    <datalist id="kbmJudulList"></datalist>
                   </div>
 
                   <div class="md:col-span-3">
@@ -4436,6 +4446,11 @@
           <span class="text-[10px] font-black text-teal-800 uppercase">Soal No. <span class="essay-number"></span></span>
           <button type="button" class="btn-remove-essay bg-rose-50 hover:bg-rose-500 text-rose-600 hover:text-white w-5 h-5 rounded flex items-center justify-center font-bold text-xs transition" title="Hapus Soal">&times;</button>
         </div>
+        <div class="mb-1.5" data-scope="item">
+          <button type="button" class="math-toggle-btn w-full flex items-center justify-center gap-1.5 px-2 py-1.5 bg-teal-600 border border-teal-700 rounded-md text-[9px] font-bold text-white uppercase tracking-wider hover:bg-teal-700 transition shadow-sm">
+            <i class="fa-solid fa-square-root-variable"></i> Buka Menu Rumus &amp; Simbol Matematika <i class="fa-solid fa-up-right-from-square text-[8px] opacity-80"></i>
+          </button>
+        </div>
         <textarea class="essay-teks w-full p-2 text-xs border border-slate-300 rounded-md focus:ring-1 focus:ring-teal-600 outline-none font-medium resize-y" rows="3" placeholder="Tuliskan pertanyaan essay..." ${isPG ? '' : 'required'}>${escapeHtml(soal)}</textarea>
         <div class="gambar-container mt-1.5" style="${gambar ? 'display:block;' : 'display:none;'}">
           <input type="text" class="essay-gambar w-full p-1.5 text-xs border border-slate-300 rounded-md focus:ring-1 focus:ring-teal-600 outline-none" placeholder="Link Gambar (Opsional)" value="${escapeHtml(gambar)}">
@@ -4477,7 +4492,7 @@
       document.getElementById('bsSectionPG').style.display = isPG ? 'flex' : 'none';
       document.getElementById('bsSectionEssayDynamic').style.display = isPG ? 'none' : 'flex';
       
-      ['bsTeksSoal', 'bsOptA', 'bsOptB', 'bsOptC', 'bsOptD'].forEach(id => {
+      ['bsTeksSoal', 'bsOptA', 'bsOptB'].forEach(id => {
         const el = document.getElementById(id);
         if (isPG) el.setAttribute('required', 'true');
         else el.removeAttribute('required');
@@ -4625,15 +4640,20 @@
           question: document.getElementById('bsTeksSoal').value.trim(),
           gambar: document.getElementById('bsLinkGambar').value.trim()
         };
-        pgData.options = { 
-          A: document.getElementById('bsOptA').value.trim(), 
-          B: document.getElementById('bsOptB').value.trim(), 
-          C: document.getElementById('bsOptC').value.trim(), 
-          D: document.getElementById('bsOptD').value.trim() 
-        };
-        const optE = document.getElementById('bsOptE').value.trim();
-        if (optE) pgData.options.E = optE;
-        pgData.answer = document.getElementById('bsKunciPG').value;
+        const optA = document.getElementById('bsOptA').value.trim();
+        const optB = document.getElementById('bsOptB').value.trim();
+        if (!pgData.question) return Swal.fire('Perhatian', 'Pertanyaan wajib diisi!', 'warning');
+        if (!optA || !optB) return Swal.fire('Perhatian', 'Opsi jawaban <b>A dan B wajib</b> diisi. C, D, dan E bersifat opsional.', 'warning');
+        pgData.options = { A: optA, B: optB };
+        ['C','D','E'].forEach(letter => {
+          const v = document.getElementById('bsOpt' + letter).value.trim();
+          if (v) pgData.options[letter] = v;
+        });
+        const kunci = document.getElementById('bsKunciPG').value;
+        if (!pgData.options[kunci]) {
+          return Swal.fire('Perhatian', `Kunci jawaban dipilih <b>${kunci}</b>, tetapi opsi ${kunci} masih kosong. Isi opsi ${kunci} terlebih dahulu atau pilih kunci lain (A/B yang sudah terisi).`, 'warning');
+        }
+        pgData.answer = kunci;
         
         bsPendingSoalDataList.push(pgData);
       } else {
@@ -8380,6 +8400,7 @@
           if (fkEl) { fkEl.innerHTML = '<option value="">Semua Kelas</option>'; kls.forEach(k => fkEl.appendChild(new Option(k, k))); }
           if (typeof filterRekap === "function") filterRekap();
           if (typeof hitungPertemuanKbm === "function") hitungPertemuanKbm();
+          if (typeof updateKbmJudulDatalist === "function") updateKbmJudulDatalist();
         } catch (e) { console.error("loadRekapJurnalViaProxy error:", e); }
       }
       loadRekapJurnalViaProxy();
@@ -10543,5 +10564,212 @@ let inboxSesiAktifNamaID = "";
 })();
 </script>
   <div id="kaldikTooltip" class="hidden fixed z-[300] max-w-[240px] bg-slate-900/95 text-white text-[11px] rounded-lg px-3 py-2 shadow-xl pointer-events-none leading-snug"></div>
+
+  <!-- Modal Rumus & Simbol Matematika (tengah-depan, tertutup otomatis setelah simbol dipilih) -->
+  <div id="mathModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+    <div id="mathModalCard" class="w-full max-w-lg bg-white rounded-xl shadow-2xl border border-teal-200 overflow-hidden">
+      <div class="bg-gradient-to-r from-teal-900 to-teal-700 px-4 py-2.5 flex justify-between items-center text-white">
+        <span class="text-[11px] font-black uppercase tracking-widest flex items-center gap-1.5"><i class="fa-solid fa-square-root-variable"></i> Rumus &amp; Simbol Matematika</span>
+        <button type="button" id="mathModalClose" class="text-white/80 hover:text-white text-lg leading-none w-6 h-6 flex items-center justify-center rounded hover:bg-white/10 transition">&times;</button>
+      </div>
+      <div class="p-3.5 max-h-[70vh] overflow-y-auto">
+        <p class="text-[9px] text-slate-500 font-medium mb-2.5 leading-snug">Klik simbol untuk menyisipkannya ke soal — panel akan <b class="text-teal-700">tertutup otomatis</b>. Untuk <b>xⁿ / xₙ</b>: blok/select teks pada soal terlebih dahulu, lalu klik tombolnya.</p>
+        <div id="mathModalPanel" class="flex flex-wrap gap-1.5 items-center">
+          <span class="math-group-label">Pangkat / Index</span>
+          <button type="button" class="math-sym-btn" data-insert="²" title="Pangkat 2 (kuadrat)">x²</button>
+          <button type="button" class="math-sym-btn" data-insert="³" title="Pangkat 3 (kubik)">x³</button>
+          <button type="button" class="math-sym-btn" data-action="superscript" title="Blok teks lalu klik → jadikan pangkat atas (xⁿ)">xⁿ</button>
+          <button type="button" class="math-sym-btn" data-action="subscript" title="Blok teks lalu klik → jadikan index bawah (xₙ)">xₙ</button>
+          <span class="math-group-label">Akar &amp; Pecahan</span>
+          <button type="button" class="math-sym-btn" data-insert="√" title="Akar kuadrat">√</button>
+          <button type="button" class="math-sym-btn" data-insert="∛" title="Akar pangkat 3">∛</button>
+          <button type="button" class="math-sym-btn" data-insert="½" title="1/2">½</button>
+          <button type="button" class="math-sym-btn" data-insert="⅓" title="1/3">⅓</button>
+          <button type="button" class="math-sym-btn" data-insert="¼" title="1/4">¼</button>
+          <button type="button" class="math-sym-btn" data-insert="¾" title="3/4">¾</button>
+          <span class="math-group-label">Operasi Hitung</span>
+          <button type="button" class="math-sym-btn" data-insert="×" title="Kali">×</button>
+          <button type="button" class="math-sym-btn" data-insert="÷" title="Bagi">÷</button>
+          <button type="button" class="math-sym-btn" data-insert="±" title="Plus-minus">±</button>
+          <button type="button" class="math-sym-btn" data-insert="−" title="Minus">−</button>
+          <span class="math-group-label">Perbandingan</span>
+          <button type="button" class="math-sym-btn" data-insert="≤" title="Kurang dari / sama dengan">≤</button>
+          <button type="button" class="math-sym-btn" data-insert="≥" title="Lebih dari / sama dengan">≥</button>
+          <button type="button" class="math-sym-btn" data-insert="≠" title="Tidak sama dengan">≠</button>
+          <button type="button" class="math-sym-btn" data-insert="≈" title="Hampir sama dengan">≈</button>
+          <span class="math-group-label">Lainnya</span>
+          <button type="button" class="math-sym-btn" data-insert="π" title="Pi">π</button>
+          <button type="button" class="math-sym-btn" data-insert="°" title="Derajat">°</button>
+          <button type="button" class="math-sym-btn" data-insert="∞" title="Tak hingga">∞</button>
+          <button type="button" class="math-sym-btn" data-insert="Σ" title="Sigma (jumlah)">Σ</button>
+          <button type="button" class="math-sym-btn" data-insert="Δ" title="Delta (perubahan)">Δ</button>
+          <button type="button" class="math-sym-btn" data-insert="θ" title="Theta (sudut)">θ</button>
+          <button type="button" class="math-sym-btn" data-insert="α" title="Alpha">α</button>
+          <button type="button" class="math-sym-btn" data-insert="β" title="Beta">β</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ============================================================
+   TAMBAHAN: Toolbar Rumus & Simbol Matematika + Autocomplete
+   Judul Materi Pokok (Jurnal Guru KBM)
+   ============================================================ */
+(function(){
+  // --- CSS tombol simbol ---
+  const st = document.createElement('style');
+  st.textContent = `
+    .math-sym-btn { padding:2px 8px; font-size:12px; font-weight:700; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; color:#334155; cursor:pointer; transition:all .15s; min-width:30px; line-height:1.5; }
+    .math-sym-btn:hover { background:#f0fdfa; border-color:#5eead4; color:#0f766e; }
+    .math-sym-btn:active { transform:scale(.92); }
+    .math-group-label { font-size:8px; font-weight:700; color:#94a3b8; text-transform:uppercase; width:100%; margin-top:3px; letter-spacing:.06em; }
+  `;
+  document.head.appendChild(st);
+
+  // --- Peta superscript (pangkat atas) & subscript (index bawah) ---
+  const SUP = {'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','a':'ᵃ','b':'ᵇ','c':'ᶜ','d':'ᵈ','e':'ᵉ','f':'ᶠ','g':'ᵍ','h':'ʰ','i':'ⁱ','j':'ʲ','k':'ᵏ','l':'ˡ','m':'ᵐ','n':'ⁿ','o':'ᵒ','p':'ᵖ','r':'ʳ','s':'ˢ','t':'ᵗ','u':'ᵘ','v':'ᵛ','w':'ʷ','x':'ˣ','y':'ʸ','z':'ᶻ','+':'⁺','-':'⁻','=':'⁼','(':'⁽',')':'⁾'};
+  const SUB = {'0':'₀','1':'₁','2':'₂','3':'₃','4':'₄','5':'₅','6':'₆','7':'₇','8':'₈','9':'₉','a':'ₐ','e':'ₑ','h':'ₕ','i':'ᵢ','j':'ⱼ','k':'ₖ','l':'ₗ','m':'ₘ','n':'ₙ','o':'ₒ','p':'ₚ','r':'ᵣ','s':'ₛ','t':'ₜ','u':'ᵤ','v':'ᵥ','x':'ₓ','+':'₊','-':'₋','=':'₌','(':'₍',')':'₎'};
+
+  // --- Ingat textarea terakhir yang aktif (agar posisi kursor tidak hilang) ---
+  let lastActiveTextarea = null;
+  document.addEventListener('focusin', (e) => {
+    const t = e.target;
+    if (t && (t.id === 'bsTeksSoal' || (t.classList && t.classList.contains('essay-teks')))) {
+      lastActiveTextarea = t;
+    }
+  });
+  // Cegah tombol simbol mencuri fokus / menghapus seleksi teks
+  document.addEventListener('mousedown', (e) => {
+    if (e.target.closest('.math-sym-btn, .math-toggle-btn')) e.preventDefault();
+  });
+
+  function findTargetTextarea(btn){
+    const wrap = btn.closest('.math-toolbar-wrap');
+    const scope = wrap ? (wrap.dataset.scope || 'default') : 'default';
+    if (scope === 'item') {
+      const item = btn.closest('.essay-item');
+      if (lastActiveTextarea && item && item.contains(lastActiveTextarea)) return lastActiveTextarea;
+      return item ? item.querySelector('.essay-teks') : null;
+    }
+    if (lastActiveTextarea && lastActiveTextarea.id === 'bsTeksSoal') return lastActiveTextarea;
+    return document.getElementById('bsTeksSoal');
+  }
+
+  function insertAtCursor(ta, text){
+    if(!ta) return;
+    const s = (ta.selectionStart != null) ? ta.selectionStart : ta.value.length;
+    const e = (ta.selectionEnd != null) ? ta.selectionEnd : ta.value.length;
+    ta.value = ta.value.slice(0, s) + text + ta.value.slice(e);
+    const pos = s + text.length;
+    try { ta.setSelectionRange(pos, pos); } catch(err){}
+    ta.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  function convertSelection(ta, map){
+    if(!ta) return false;
+    const s = ta.selectionStart, e = ta.selectionEnd;
+    if (s == null || e == null || s === e) {
+      // Tidak ada teks yang diblok: beri tahu singkat, modal tetap terbuka
+      if (window.Swal) Swal.fire({ icon:'info', title:'Blok teks dulu', text:'Blok/select angka atau huruf pada soal, lalu klik tombol ini untuk mengubahnya menjadi pangkat/index.', timer:2200, showConfirmButton:false });
+      return false;
+    }
+    const sel = ta.value.slice(s, e);
+    const conv = sel.split('').map(c => map[c] || map[c.toLowerCase()] || c).join('');
+    ta.value = ta.value.slice(0, s) + conv + ta.value.slice(e);
+    try { ta.setSelectionRange(s, s + conv.length); } catch(err){}
+    ta.dispatchEvent(new Event('input', { bubbles: true }));
+    return true;
+  }
+
+  // --- Target textarea aktif untuk modal ---
+  let activeMathTarget = null;
+
+  function resolveTargetFromTrigger(triggerBtn){
+    const wrap = triggerBtn.closest('[data-scope]');
+    const scope = wrap ? (wrap.dataset.scope || 'default') : 'default';
+    if (scope === 'item') {
+      const item = triggerBtn.closest('.essay-item');
+      if (lastActiveTextarea && item && item.contains(lastActiveTextarea)) return lastActiveTextarea;
+      return item ? item.querySelector('.essay-teks') : null;
+    }
+    if (lastActiveTextarea && lastActiveTextarea.id === 'bsTeksSoal') return lastActiveTextarea;
+    return document.getElementById('bsTeksSoal');
+  }
+
+  function openMathModal(triggerBtn){
+    activeMathTarget = resolveTargetFromTrigger(triggerBtn);
+    const m = document.getElementById('mathModal');
+    if (m) m.classList.remove('hidden');
+  }
+  function closeMathModal(){
+    const m = document.getElementById('mathModal');
+    if (m) m.classList.add('hidden');
+  }
+
+  // --- Delegasi klik: buka modal + sisipkan simbol + auto-close setelah dipilih ---
+  document.addEventListener('click', (ev) => {
+    if (ev.target.closest('#mathModalClose')) { closeMathModal(); return; }
+    if (ev.target.id === 'mathModal') { closeMathModal(); return; }
+    const tgl = ev.target.closest('.math-toggle-btn');
+    if (tgl) { openMathModal(tgl); return; }
+    const btn = ev.target.closest('.math-sym-btn');
+    if (btn) {
+      const ta = activeMathTarget;
+      let ok = false;
+      if (btn.dataset.action === 'superscript') { ok = convertSelection(ta, SUP); }
+      else if (btn.dataset.action === 'subscript') { ok = convertSelection(ta, SUB); }
+      else if (btn.dataset.insert) { insertAtCursor(ta, btn.dataset.insert); ok = true; }
+      if (ok) closeMathModal();
+    }
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMathModal(); });
+
+  /* ============================================================
+     Autocomplete Judul Materi Pokok — diambil dari jurnal yang
+     pernah diinput, difilter sesuai Guru, Mapel, dan Kelas.
+     ============================================================ */
+  window.updateKbmJudulDatalist = function(){
+    const dl = document.getElementById('kbmJudulList');
+    if (!dl) return;
+    const guruEl = document.getElementById('kbmGuru');
+    const mapelEl = document.getElementById('kbmMapel');
+    const kelasEl = document.getElementById('kbmKelas');
+    const guru = guruEl ? guruEl.value : '';
+    const mapel = mapelEl ? mapelEl.value : '';
+    const kelas = kelasEl ? kelasEl.value : '';
+    const data = window.rekapAllData || [];
+    const filtered = data.filter(r =>
+      (!guru  || (r.guru  || '') === guru) &&
+      (!mapel || String(r.mapel || '').toLowerCase() === String(mapel).toLowerCase()) &&
+      (!kelas || (r.kelas || '') === kelas)
+    );
+    const juduls = [...new Set(filtered.map(r => String(r.judul || '').trim()).filter(Boolean))]
+      .sort((a, b) => a.localeCompare(b, 'id'));
+    dl.innerHTML = juduls.map(j => '<option value="' + j.replace(/"/g, '&quot;') + '">').join('');
+  };
+
+  function bindKbmJudulFilters(){
+    ['kbmGuru','kbmMapel','kbmKelas'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && !el.dataset.judulBound) {
+        el.dataset.judulBound = '1';
+        el.addEventListener('change', window.updateKbmJudulDatalist);
+      }
+    });
+    const inp = document.getElementById('kbmJudul');
+    if (inp && !inp.dataset.judulBound) {
+      inp.dataset.judulBound = '1';
+      inp.addEventListener('focus', window.updateKbmJudulDatalist);
+      inp.addEventListener('click', window.updateKbmJudulDatalist);
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bindKbmJudulFilters);
+  } else {
+    bindKbmJudulFilters();
+  }
+})();
+</script>
 </body>
 </html>
