@@ -1126,7 +1126,7 @@
               <div class="bg-gradient-to-r from-teal-900 to-teal-700 px-5 py-2.5 flex justify-between items-center text-white">
                 <div>
                   <h2 class="text-xs font-black tracking-widest uppercase">Form Setoran Tahfizh</h2>
-                  <p class="text-[9px] text-teal-100 font-medium">Pencatatan hafalan harian santri dan mutaba'ah</p>
+                  <p class="text-[9px] text-teal-100 font-medium">Pencatatan bacaan harian santri dan mutaba'ah</p>
                 </div>
                 <div class="flex items-center gap-1.5 bg-black/20 px-2.5 py-1 rounded-md text-[9px] font-bold">
                   <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -1730,7 +1730,7 @@
               <div class="bg-gradient-to-r from-teal-900 to-teal-700 px-5 py-2.5 flex justify-between items-center text-white shrink-0">
                 <div>
                   <h2 class="text-xs font-black tracking-widest uppercase">Database Setoran Tahfizh</h2>
-                  <p class="text-[9px] text-teal-100 font-medium">Rekapan riwayat setoran hafalan santri</p>
+                  <p class="text-[9px] text-teal-100 font-medium">Rekapan riwayat setoran bacaan santri</p>
                 </div>
                 <button id="btnExportTahfizh" class="bg-emerald-500 hover:bg-emerald-600 text-white px-2.5 py-1 rounded text-[9px] uppercase font-bold tracking-wider transition shadow flex items-center gap-1">
                   <i class="fa-solid fa-file-excel"></i> Download Excel
@@ -2463,15 +2463,15 @@
               if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(sample[0])) { label = 'Waktu Daftar'; role = 'waktu'; }
               else if (sample.some(s => /^(Ulya|Wustha)/i.test(s.trim()))) { label = 'Jenjang'; role = 'jenjang'; }
               else if (sample.every(s => /^[0-9+\s()-]{9,16}$/.test(s.replace(/\s/g,'')))) { label = 'No. HP'; role = 'hp'; }
-              else if (sample.every(s => /^(Lancar|Belum[ ]?Lancar)$/i.test(s.trim()))) { label = 'Hafalan'; role = 'hafalan'; }
+              else if (sample.every(s => /^(Lancar|Belum[ ]?Lancar)$/i.test(s.trim()))) { label = 'Bacaan'; role = 'bacaan'; }
               else if (sample.every(s => /^(Perempuan|Laki[- ]?laki|Pria|Wanita)$/i.test(s.trim()))) { label = 'JK'; role = 'jk'; }
               else if (sample.every(s => s.length > 18) && /(jalan|jl\.?|ds\.?|desa|kec\.?|kel\.?|dusun|rt|rw|link|gng|gunung|no\.?)/i.test(gabung)) { label = 'Alamat'; role = 'alamat'; }
               else if (!namaDipakai && sample.every(s => s.length >= 3 && s.length <= 45 && !/^\d+$/.test(s))) { label = 'Nama'; role = 'nama'; namaDipakai = true; }
 
               cols.push({ idx: c, label: label, role: role });
             }
-            // urutkan: No, Waktu, Jenjang, Nama, Alamat, No.HP, Hafalan, JK, sisanya
-            const urutan = { 'no':0, 'waktu':1, 'jenjang':2, 'nama':3, 'alamat':4, 'hp':5, 'hafalan':6, 'jk':7, 'lain':9 };
+            // urutkan: No, Waktu, Jenjang, Nama, Alamat, No.HP, bacaan, JK, sisanya
+            const urutan = { 'no':0, 'waktu':1, 'jenjang':2, 'nama':3, 'alamat':4, 'hp':5, 'bacaan':6, 'jk':7, 'lain':9 };
             cols.sort((a,b) => (urutan[a.role]||9) - (urutan[b.role]||9));
             return cols;
           }
@@ -2594,7 +2594,7 @@
                       if (c.role === 'jk') cls += ' ' + warnaJK;
                       if (c.role === 'hp') cls += ' whitespace-nowrap';
                       if (c.role === 'alamat') cls += ' text-slate-500 max-w-[280px]';
-                      if (c.role === 'hafalan') {
+                      if (c.role === 'bacaan') {
                         cls += ' text-center font-bold whitespace-nowrap ' + (/^lancar$/i.test(val.trim()) ? 'text-emerald-600' : 'text-amber-600');
                       }
                       return '<td class="' + cls + '">' + (val || '-') + '</td>';
@@ -2710,7 +2710,7 @@
                 if (i === 0) cls = ' class="c-no"';
                 else if (/no\.?\s*hp|telp/i.test(header[i])) cls = ' class="c-hp"';
                 else if (/jk|kelamin/i.test(header[i])) cls = ' class="c-jk"';
-                else if (/hafalan/i.test(header[i])) cls = ' class="c-haf"';
+                else if (/bacaan/i.test(header[i])) cls = ' class="c-haf"';
                 return '<td' + cls + '>' + cell + '</td>';
               }).join('') + '</tr>';
             }).join('');
@@ -2885,7 +2885,7 @@
               <div class="bg-gradient-to-r from-teal-900 to-teal-700 px-5 py-2.5 flex justify-between items-center text-white shrink-0">
                 <div>
                   <h2 class="text-xs font-black tracking-widest uppercase">Rekap Tasmi' Qur'an</h2>
-                  <p class="text-[9px] text-teal-100 font-medium">Data tasmi' hafalan santri per tanggal, juz &amp; halaqoh</p>
+                  <p class="text-[9px] text-teal-100 font-medium">Data tasmi' bacaan santri per tanggal, juz &amp; halaqoh</p>
                 </div>
                 <span class="bg-white/15 border border-white/20 text-white px-2.5 py-1 rounded text-[9px] font-bold shadow-sm uppercase tracking-wider">Auto-Sync</span>
               </div>
@@ -2966,7 +2966,7 @@
               <div class="bg-gradient-to-r from-teal-900 to-teal-700 px-5 py-2.5 flex justify-between items-center text-white shrink-0">
                 <div>
                   <h2 class="text-xs font-black tracking-widest uppercase">Input Tasmi' Juz'iyyah</h2>
-                  <p class="text-[9px] text-teal-100 font-medium">Form pencatatan tasmi' hafalan santri (verifikasi password ustadz)</p>
+                  <p class="text-[9px] text-teal-100 font-medium">Form pencatatan tasmi' bacaan santri (verifikasi password ustadz)</p>
                 </div>
                 <span class="bg-white/15 border border-white/20 text-white px-2.5 py-1 rounded text-[9px] font-bold shadow-sm uppercase tracking-wider"><i class="fas fa-shield-alt mr-1"></i> IZY 2026</span>
               </div>
@@ -3054,7 +3054,7 @@
               <div class="bg-gradient-to-r from-teal-900 to-teal-700 px-5 py-2.5 flex justify-between items-center text-white shrink-0">
                 <div>
                   <h2 class="text-xs font-black tracking-widest uppercase">Capaian Beban Tahfizh</h2>
-                  <p class="text-[9px] text-teal-100 font-medium">Ketuntasan target hafalan per ustadz &amp; pencarian detail santri — Semester 1 TA 2026/2027</p>
+                  <p class="text-[9px] text-teal-100 font-medium">Ketuntasan target bacaan per ustadz &amp; pencarian detail santri — Semester 1 TA 2026/2027</p>
                 </div>
                 <button type="button" onclick="pindahMenu('inputTasmi')" class="bg-amber-500 hover:bg-amber-600 text-white px-2.5 py-1 rounded text-[9px] uppercase font-bold tracking-wider transition shadow flex items-center gap-1.5"><i class="fa-solid fa-quran"></i> Input Tasmi'</button>
               </div>
@@ -3163,7 +3163,7 @@
               <div class="bg-gradient-to-r from-teal-900 to-teal-700 px-5 py-2.5 flex justify-between items-center text-white shrink-0">
                 <div>
                   <h2 class="text-xs font-black tracking-widest uppercase">Belum Setoran Tahfizh Hari Ini</h2>
-                  <p class="text-[9px] text-teal-100 font-medium">Pemantauan santri per halaqoh yang belum menyetor hafalan hari ini</p>
+                  <p class="text-[9px] text-teal-100 font-medium">Pemantauan santri per halaqoh yang belum menyetor bacaan hari ini</p>
                 </div>
                 <button type="button" onclick="bs_muatUlang()" class="bg-amber-500 hover:bg-amber-600 text-white px-2.5 py-1 rounded text-[9px] uppercase font-bold tracking-wider transition shadow flex items-center gap-1.5"><i class="fa-solid fa-rotate"></i> Muat Ulang</button>
               </div>
@@ -3544,7 +3544,7 @@
               <td class="px-3 py-2 text-center font-black text-emerald-600 text-xs">A+</td>
               <td class="px-3 py-2 text-center font-bold">96 – 100</td>
               <td class="px-3 py-2 font-bold">Sangat Istimewa</td>
-              <td class="px-3 py-2">Hafalan lancar tanpa salah, tajwid sempurna.</td>
+              <td class="px-3 py-2">bacaan lancar tanpa salah, tajwid sempurna.</td>
             </tr>
             <tr class="hover:bg-slate-50 transition">
               <td class="px-3 py-2 text-center font-black text-teal-600 text-xs">A</td>
@@ -4097,8 +4097,8 @@
     // (dbBiodata diakses via WORKER_PROXY — lihat apiGet/apiPush di atas)
     const dbSetoran = getDatabase(initializeApp({
       apiKey: "AIzaSyDfpXCyG-Cn7iw3e3EdBRnkzJ5gctUHOtk",
-      databaseURL: "https://data-setoran-hafalan-quran-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "data-setoran-hafalan-quran"
+      databaseURL: "https://data-setoran-bacaan-quran-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "data-setoran-bacaan-quran"
     }, "appSetoran"));
 
     // (dbJurnal diakses via WORKER_PROXY — lihat apiGet/apiPush di atas)
@@ -6445,8 +6445,8 @@
           const b = document.getElementById("btnSubmitSetoran");
           b.disabled = true; b.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
           try {
-            await set(push(ref(dbSetoran, 'setoran_hafalan')), dataSetoranSubmit);
-            Swal.fire('Alhamdulillah', 'Data hafalan santri berhasil disimpan!', 'success');
+            await set(push(ref(dbSetoran, 'setoran_bacaan')), dataSetoranSubmit);
+            Swal.fire('Alhamdulillah', 'Data bacaan santri berhasil disimpan!', 'success');
             document.getElementById("ayatAkhir").value = "";
             document.getElementById("nilai").value = "";
           } catch(e) {
@@ -8406,7 +8406,7 @@
       loadRekapJurnalViaProxy();
       setInterval(loadRekapJurnalViaProxy, 5000);
 
-      onValue(ref(dbSetoran, "setoran_hafalan"), snap => {
+      onValue(ref(dbSetoran, "setoran_bacaan"), snap => {
         dataSetoranAll = [];
         snap.forEach(c => { dataSetoranAll.push({ ...c.val(), key: c.key }); });
         
@@ -9648,7 +9648,7 @@ let inboxSesiAktifNamaID = "";
 
   // ============================================================
   // CAPAIAN BEBAN TAHFIZH (lazy-load saat menu dibuka pertama kali)
-  // Sumber data: dbSetoran -> setoran_hafalan (sama dengan Rekap Setoran)
+  // Sumber data: dbSetoran -> setoran_bacaan (sama dengan Rekap Setoran)
   // ============================================================
   let capaianTahfizhTerisi = false;
   window.muatCapaianTahfizh = function () {
@@ -9941,7 +9941,7 @@ let inboxSesiAktifNamaID = "";
     });
 
     // --- Subscribe data setoran (live) ---
-    onValue(ref(dbSetoran, 'setoran_hafalan'), (snapshot) => {
+    onValue(ref(dbSetoran, 'setoran_bacaan'), (snapshot) => {
       const loadingArea = document.getElementById("ct_loadingArea");
       if (!snapshot.exists()) {
         loadingArea.innerHTML = "<div class='py-10 text-slate-500 text-xs'>Belum ada data setoran di database.</div>";
@@ -10011,7 +10011,7 @@ let inboxSesiAktifNamaID = "";
 
   // ============================================================
   // BELUM SETORAN TAHFIZH HARI INI (lazy-load saat menu dibuka)
-  // Gabungan: dbBiodata (identitas_santri per halaqoh) + dbSetoran (setoran_hafalan hari ini)
+  // Gabungan: dbBiodata (identitas_santri per halaqoh) + dbSetoran (setoran_bacaan hari ini)
   // ============================================================
   let belumSetoranTerisi = false;
   let bs_hariIndex = -1, bs_tgl = 0, bs_bln = "", bs_thn = 0;
@@ -10039,7 +10039,7 @@ let inboxSesiAktifNamaID = "";
       try {
         const [biodataSnap, setoranSnap] = await Promise.all([
           apiGet("biodata", "identitas_santri"),
-          get(query(ref(dbSetoran, 'setoran_hafalan')))
+          get(query(ref(dbSetoran, 'setoran_bacaan')))
         ]);
         container.innerHTML = "";
         let dataKelompok = {};
@@ -10090,7 +10090,7 @@ let inboxSesiAktifNamaID = "";
           }
         });
         if (totalBelum === 0) {
-          tampilkanStateBS('<i class="fa-solid fa-circle-check text-teal-600"></i>', "Selesai & Alhamdulillah!", "Semua santri dari seluruh halaqoh telah menyelesaikan setoran hafalan hari ini.");
+          tampilkanStateBS('<i class="fa-solid fa-circle-check text-teal-600"></i>', "Selesai & Alhamdulillah!", "Semua santri dari seluruh halaqoh telah menyelesaikan setoran bacaan hari ini.");
         } else {
           if (stateDiv) stateDiv.classList.add('hidden');
         }
