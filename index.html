@@ -436,6 +436,9 @@
             <button id="tabBtnRekapKbm" onclick="pindahMenu('rekapKbm')" class="nav-btn w-full text-left p-2 rounded-lg text-xs font-semibold text-teal-200 flex items-center gap-2">
               <i class="fa-solid fa-table-list w-4 text-center"></i> Rekap Jurnal KBM
             </button>
+            <button id="tabBtnCekJurnal" onclick="pindahMenu('cekJurnal')" class="nav-btn w-full text-left p-2 rounded-lg text-xs font-semibold text-teal-200 flex items-center gap-2">
+              <i class="fa-solid fa-magnifying-glass w-4 text-center"></i> Cek Jurnal
+            </button>
             <button id="tabBtnRekapNilai" onclick="pindahMenu('rekapNilai')" class="nav-btn w-full text-left p-2 rounded-lg text-xs font-semibold text-teal-200 flex items-center gap-2">
               <i class="fa-solid fa-file-signature w-4 text-center"></i> Rekap Nilai Mapel
             </button>
@@ -1362,10 +1365,15 @@
                     </select>
                   </div>
 
-                  <div class="md:col-span-3">
+                  <div id="kbmJudulWrapper" class="md:col-span-3 relative">
                     <label class="block text-[9px] font-bold text-slate-500 uppercase mb-1">Judul Materi Pokok <span class="text-teal-600 normal-case font-medium">(klik untuk melihat materi yang pernah diinput)</span></label>
-                    <input type="text" id="kbmJudul" list="kbmJudulList" placeholder="Ketikkan judul materi, atau klik untuk memilih dari materi sebelumnya..." required autocomplete="off" class="w-full p-2 text-xs border border-slate-300 rounded-md focus:ring-1 focus:ring-teal-600 outline-none font-semibold shadow-sm" />
-                    <datalist id="kbmJudulList"></datalist>
+                    <div class="relative flex items-center">
+                      <input type="text" id="kbmJudul" placeholder="Ketikkan judul materi, atau klik untuk memilih dari materi sebelumnya..." required autocomplete="off" class="w-full p-2 pr-8 text-xs border border-slate-300 rounded-md focus:ring-1 focus:ring-teal-600 focus:border-teal-600 outline-none font-semibold shadow-sm cursor-text" />
+                      <button type="button" id="kbmJudulToggleBtn" tabindex="-1" class="absolute right-2 text-slate-400 hover:text-teal-700 p-1 cursor-pointer transition" title="Pilih dari materi sebelumnya">
+                        <i id="kbmJudulChevron" class="fa-solid fa-chevron-down text-[10px] transition-transform duration-200"></i>
+                      </button>
+                    </div>
+                    <div id="kbmJudulDropdown" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-teal-300 rounded-lg shadow-xl max-h-56 overflow-y-auto z-50 divide-y divide-slate-100"></div>
                   </div>
 
                   <div class="md:col-span-3">
@@ -2089,6 +2097,57 @@
             </div>
           </section>
 
+          <!-- ========================================== -->
+          <!-- PANEL: CEK JURNAL KBM                      -->
+          <!-- ========================================== -->
+          <section id="panelCekJurnal" class="w-full hidden animate-[fadeIn_0.3s_ease-in-out]">
+            <div class="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden flex flex-col h-[calc(100vh-4.5rem)]">
+              <div class="bg-gradient-to-r from-teal-900 to-teal-700 px-5 py-2.5 flex justify-between items-center text-white shrink-0">
+                <div>
+                  <h2 class="text-xs font-black tracking-widest uppercase">Cek Jurnal KBM</h2>
+                  <p class="text-[9px] text-teal-100 font-medium">Pemeriksaan & verifikasi kelengkapan jurnal mengajar guru</p>
+                </div>
+              </div>
+              <div class="p-4 flex-1 overflow-y-auto bg-slate-50/50">
+                <style>
+                  #panelCekJurnal .cj-title { text-align:center; color:#00695c; font-size:15px; font-weight:800; text-transform:uppercase; border-bottom:2px solid #b2dfdb; padding-bottom:10px; margin:0 0 12px; }
+                  #panelCekJurnal .cj-time-box { background:#fff3cd; color:#856404; padding:10px; border:1px solid #ffeeba; border-radius:6px; margin-bottom:12px; text-align:center; font-weight:600; font-size:12px; }
+                  #panelCekJurnal .cj-time-box.closed { background:#f8d7da; color:#721c24; border-color:#f5c6cb; }
+                  #panelCekJurnal .cj-filters { display:flex; gap:8px; margin-bottom:12px; }
+                  #panelCekJurnal .cj-filters select { flex:1; padding:9px 6px; border:1px solid #cbd5e1; border-radius:6px; font-size:12px; outline:none; color:#334155; background:#f8fafc; }
+                  #panelCekJurnal .cj-table { width:100%; border-collapse:collapse; table-layout:fixed; }
+                  #panelCekJurnal .cj-table th, #panelCekJurnal .cj-table td { padding:9px 5px; text-align:left; border-bottom:1px solid #f1f5f9; word-wrap:break-word; font-size:12px; color:#334155; }
+                  #panelCekJurnal .cj-table th { background:#00897b; color:#fff; font-size:10px; text-transform:uppercase; }
+                  #panelCekJurnal .cj-table tr:nth-child(even) { background:#f8fafc; }
+                  #panelCekJurnal .cj-status { font-size:15px; text-align:center; font-weight:bold; }
+                  #panelCekJurnal .cj-ok { color:#16a34a; }
+                  #panelCekJurnal .cj-no { color:#dc2626; }
+                  #panelCekJurnal .cj-loading { text-align:center; padding:18px; font-weight:bold; color:#00897b; font-size:12px; }
+                  #panelCekJurnal .cj-nodata { text-align:center; padding:18px; color:#94a3b8; font-style:italic; font-size:12px; }
+                </style>
+                <h3 class="cj-title" id="cj_mainTitle">Cek Kepatuhan Jurnal KBM</h3>
+                <div id="cj_timeWarningBox" class="cj-time-box"><span id="cj_timeWarningText">Menghitung sisa waktu...</span></div>
+                <div class="cj-filters">
+                  <select id="cj_bulanSelect">
+                    <option value="2026-07">Juli 2026</option>
+                    <option value="2026-08">Agustus 2026</option>
+                    <option value="2026-09">September 2026</option>
+                    <option value="2026-10">Oktober 2026</option>
+                    <option value="2026-11" selected>November 2026</option>
+                    <option value="2026-12">Desember 2026</option>
+                  </select>
+                  <select id="cj_guruSelect"><option value="">-- Tunggu Sebentar...</option></select>
+                </div>
+                <div id="cj_loading" class="cj-loading">Memuat data dari database...</div>
+                <div id="cj_tableContainer" style="display:none; width:100%;">
+                  <table class="cj-table" id="cj_resultTable">
+                    <thead id="cj_tableHead"></thead>
+                    <tbody id="cj_resultBody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </section>
 
           <!-- ========================================== -->
           <!-- 12. PANEL: REKAP SANTRI BERPRESTASI        -->
@@ -2458,6 +2517,7 @@
 
               const gabung = sample.join(' | ');
               let label = headers[c] || ('Kolom ' + (c + 1));
+              if (/^column\s*9$/i.test(String(label).trim())) label = 'Minat';
               let role = 'lain';
 
               if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(sample[0])) { label = 'Waktu Daftar'; role = 'waktu'; }
@@ -3779,7 +3839,7 @@
       const panels = [
         'panelBeranda', 'panelInputSoal', 'panelDaftarSoal', 'panelSettingSoal',
         'panelSetoran', 'panelInputKbm', 'panelNilaiKbm', 'panelAbsenKbm', 'panelAbsenKst', 'panelAdab',
-        'panelRekapKbm', 'panelRekapTahfizh', 'panelRekapNilai', 'panelRekapAbsenKbm', 'panelRekapAdab', 'panelRekapKinerja', 'panelCekInputNilai', 'panelRekapPrestasi', 'panelProfilData', 'panelRosterMapel', 'panelRankingKelas', 'panelKlasemenAdab', 'panelRekapTasmi', 'panelInputTasmi', 'panelCapaianTahfizh', 'panelBelumSetoran', 'panelDownload', 'panelInbox', 'panelUjian', 'panelKontrolUjian', 'panelKaldik', 'panelDaftar'
+        'panelRekapKbm', 'panelRekapTahfizh', 'panelRekapNilai', 'panelRekapAbsenKbm', 'panelRekapAdab', 'panelRekapKinerja', 'panelCekInputNilai', 'panelCekJurnal', 'panelRekapPrestasi', 'panelProfilData', 'panelRosterMapel', 'panelRankingKelas', 'panelKlasemenAdab', 'panelRekapTasmi', 'panelInputTasmi', 'panelCapaianTahfizh', 'panelBelumSetoran', 'panelDownload', 'panelInbox', 'panelUjian', 'panelKontrolUjian', 'panelKaldik', 'panelDaftar'
       ];
       panels.forEach(p => {
         const el = document.getElementById(p);
@@ -3789,7 +3849,7 @@
       const tabs = [
         'tabBtnBeranda', 'tabBtnInputSoal', 'tabBtnDaftarSoal', 'tabBtnSettingSoal',
         'tabBtnSetoran', 'tabBtnInputKbm', 'tabBtnNilaiKbm', 'tabBtnAbsenKbm', 'tabBtnAbsenKst', 'tabBtnAdab',
-        'tabBtnRekapKbm', 'tabBtnRekapTahfizh', 'tabBtnRekapNilai', 'tabBtnRekapAbsenKbm', 'tabBtnRekapAdab', 'tabBtnRekapKinerja', 'tabBtnCekInputNilai', 'tabBtnRekapPrestasi', 'tabBtnProfilData', 'tabBtnRosterMapel', 'tabBtnRankingKelas', 'tabBtnKlasemenAdab', 'tabBtnRekapTasmi', 'tabBtnInputTasmi', 'tabBtnCapaianTahfizh', 'tabBtnBelumSetoran', 'tabBtnDownload', 'tabBtnInbox', 'tabBtnUjian', 'tabBtnKontrolUjian', 'tabBtnKaldik', 'tabBtnDaftar'
+        'tabBtnRekapKbm', 'tabBtnRekapTahfizh', 'tabBtnRekapNilai', 'tabBtnRekapAbsenKbm', 'tabBtnRekapAdab', 'tabBtnRekapKinerja', 'tabBtnCekInputNilai', 'tabBtnCekJurnal', 'tabBtnRekapPrestasi', 'tabBtnProfilData', 'tabBtnRosterMapel', 'tabBtnRankingKelas', 'tabBtnKlasemenAdab', 'tabBtnRekapTasmi', 'tabBtnInputTasmi', 'tabBtnCapaianTahfizh', 'tabBtnBelumSetoran', 'tabBtnDownload', 'tabBtnInbox', 'tabBtnUjian', 'tabBtnKontrolUjian', 'tabBtnKaldik', 'tabBtnDaftar'
       ];
       tabs.forEach(t => {
         const el = document.getElementById(t);
@@ -3920,6 +3980,12 @@
         titleEl.innerText = 'Cek Input Nilai';
         iconEl.className = 'fa-solid fa-clipboard-check text-teal-600 text-base';
         if (typeof window.loadMasterDataCekNilai === 'function' && window.masterDataGuruMapel.length === 0) window.loadMasterDataCekNilai();
+      } else if (menu === 'cekJurnal') {
+        document.getElementById('panelCekJurnal').classList.remove('hidden');
+        document.getElementById('tabBtnCekJurnal').classList.add('active');
+        titleEl.innerText = 'Cek Jurnal';
+        iconEl.className = 'fa-solid fa-magnifying-glass text-teal-600 text-base';
+        if (typeof window.muatCekJurnal === 'function') window.muatCekJurnal();
       } else if (menu === 'rekapPrestasi') {
         document.getElementById('panelRekapPrestasi').classList.remove('hidden');
         document.getElementById('tabBtnRekapPrestasi').classList.add('active');
@@ -5224,6 +5290,7 @@
     // ==========================================
     let pendingKbmPayload = null;
     let rekapAllData = [], rekapFilteredData = [], rekapItemsShown = 10;
+    window.rekapAllData = rekapAllData;
 
     function getHariIndo(dt) {
       if (!dt) return "";
@@ -8288,9 +8355,14 @@
         window.renderProfilDataSantri(globalSantriList);
       }
       
+      window.globalJadwalKBM = globalJadwalKBM;
+      try { localStorage.setItem('izy_jadwal_kbm_cache', JSON.stringify(globalJadwalKBM)); } catch (e) {}
       // Update Roster & Mapel
       if (typeof window.renderRosterMapel === 'function') {
         window.renderRosterMapel(globalJadwalKBM);
+      }
+      if (typeof window.syncCekJurnalJadwal === 'function') {
+        window.syncCekJurnalJadwal(globalJadwalKBM);
       }
 
       // Populate semua Dropdown Guru (Portal + Bank Soal)
@@ -8391,20 +8463,51 @@
       async function loadRekapJurnalViaProxy() {
         try {
           const snap = await apiGet("jurnal", "jurnal");
-          rekapAllData = [];
-          snap.forEach(c => { rekapAllData.push({ ...c.val(), key: c.key }); });
-          rekapAllData.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
-          rekapAllData.reverse();
+          const tempArr = [];
+          snap.forEach(c => { if (c.val()) tempArr.push({ ...c.val(), key: c.key }); });
+          if (tempArr.length > 0) {
+            rekapAllData = tempArr;
+            rekapAllData.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+            rekapAllData.reverse();
+            try { localStorage.setItem('izy_rekap_jurnal_cache', JSON.stringify(rekapAllData)); } catch (e) {}
+          } else if (rekapAllData.length === 0) {
+            try {
+              const cached = JSON.parse(localStorage.getItem('izy_rekap_jurnal_cache') || '[]');
+              if (Array.isArray(cached) && cached.length > 0) rekapAllData = cached;
+            } catch (e) {}
+          }
+          window.rekapAllData = rekapAllData;
           const kls = [...new Set(rekapAllData.map(i => i.kelas))].filter(Boolean).sort();
           const fkEl = document.getElementById("filterKelas");
-          if (fkEl) { fkEl.innerHTML = '<option value="">Semua Kelas</option>'; kls.forEach(k => fkEl.appendChild(new Option(k, k))); }
+          if (fkEl) {
+            const curK = fkEl.value;
+            fkEl.innerHTML = '<option value="">Semua Kelas</option>';
+            kls.forEach(k => fkEl.appendChild(new Option(k, k)));
+            if (curK) fkEl.value = curK;
+          }
           if (typeof filterRekap === "function") filterRekap();
           if (typeof hitungPertemuanKbm === "function") hitungPertemuanKbm();
           if (typeof updateKbmJudulDatalist === "function") updateKbmJudulDatalist();
-        } catch (e) { console.error("loadRekapJurnalViaProxy error:", e); }
+          if (typeof window.syncCekJurnalData === "function") window.syncCekJurnalData(rekapAllData);
+        } catch (e) {
+          console.error("loadRekapJurnalViaProxy error:", e);
+          if (rekapAllData.length === 0) {
+            try {
+              const cached = JSON.parse(localStorage.getItem('izy_rekap_jurnal_cache') || '[]');
+              if (Array.isArray(cached) && cached.length > 0) {
+                rekapAllData = cached;
+                window.rekapAllData = rekapAllData;
+              }
+            } catch (err) {}
+          }
+          if (typeof window.syncCekJurnalData === "function") window.syncCekJurnalData(rekapAllData);
+        }
       }
+      window.loadRekapJurnalViaProxy = loadRekapJurnalViaProxy;
       loadRekapJurnalViaProxy();
-      setInterval(loadRekapJurnalViaProxy, 5000);
+      setInterval(() => {
+        if (!document.hidden) loadRekapJurnalViaProxy();
+      }, 60000);
 
       onValue(ref(dbSetoran, "setoran_hafalan"), snap => {
         dataSetoranAll = [];
@@ -10726,49 +10829,514 @@ let inboxSesiAktifNamaID = "";
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMathModal(); });
 
   /* ============================================================
-     Autocomplete Judul Materi Pokok — diambil dari jurnal yang
-     pernah diinput, difilter sesuai Guru, Mapel, dan Kelas.
+     Custom Dropdown Judul Materi Pokok — tampil langsung saat
+     diklik (tanpa harus tahan klik), bisa dipilih dengan klik,
+     dan hanya tertutup saat klik di luar kotak / memilih item.
      ============================================================ */
-  window.updateKbmJudulDatalist = function(){
-    const dl = document.getElementById('kbmJudulList');
-    if (!dl) return;
+  let kbmJudulDropdownOpen = false;
+
+  function getFilteredKbmJudulList(filterByInputText) {
     const guruEl = document.getElementById('kbmGuru');
     const mapelEl = document.getElementById('kbmMapel');
     const kelasEl = document.getElementById('kbmKelas');
-    const guru = guruEl ? guruEl.value : '';
-    const mapel = mapelEl ? mapelEl.value : '';
-    const kelas = kelasEl ? kelasEl.value : '';
-    const data = window.rekapAllData || [];
-    const filtered = data.filter(r =>
-      (!guru  || (r.guru  || '') === guru) &&
-      (!mapel || String(r.mapel || '').toLowerCase() === String(mapel).toLowerCase()) &&
-      (!kelas || (r.kelas || '') === kelas)
+    const inpEl = document.getElementById('kbmJudul');
+
+    const guru = guruEl ? guruEl.value.trim() : '';
+    const mapel = mapelEl ? mapelEl.value.trim() : '';
+    const kelas = kelasEl ? kelasEl.value.trim() : '';
+    const keyword = (filterByInputText && inpEl) ? inpEl.value.trim().toLowerCase() : '';
+
+    let data = window.rekapAllData || [];
+    if (!data || data.length === 0) {
+      try {
+        const cached = JSON.parse(localStorage.getItem('izy_rekap_jurnal_cache') || '[]');
+        if (Array.isArray(cached)) data = cached;
+      } catch (e) {}
+    }
+
+    const clean = s => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const cGuru = clean(guru), cMapel = clean(mapel), cKelas = clean(kelas);
+
+    const cocok = data.filter(r =>
+      (!cGuru  || clean(r.guru).includes(cGuru)  || cGuru.includes(clean(r.guru))) &&
+      (!cMapel || clean(r.mapel).includes(cMapel) || cMapel.includes(clean(r.mapel))) &&
+      (!cKelas || clean(r.kelas).includes(cKelas) || cKelas.includes(clean(r.kelas)))
     );
-    const juduls = [...new Set(filtered.map(r => String(r.judul || '').trim()).filter(Boolean))]
-      .sort((a, b) => a.localeCompare(b, 'id'));
-    dl.innerHTML = juduls.map(j => '<option value="' + j.replace(/"/g, '&quot;') + '">').join('');
+
+    let juduls = [...new Set(cocok.map(r => String(r.judul || '').trim()).filter(Boolean))];
+
+    // Fallback bertahap: jika hasil spesifik kurang dari 5, tambahkan dari mapel yang sama lalu seluruh judul
+    if (juduls.length < 5 && cMapel) {
+      const cocokMapel = data.filter(r => clean(r.mapel).includes(cMapel) || cMapel.includes(clean(r.mapel)));
+      const jMapel = [...new Set(cocokMapel.map(r => String(r.judul || '').trim()).filter(Boolean))];
+      juduls = [...new Set([...juduls, ...jMapel])];
+    }
+    if (juduls.length < 5) {
+      const semua = [...new Set(data.map(r => String(r.judul || '').trim()).filter(Boolean))];
+      juduls = [...new Set([...juduls, ...semua])];
+    }
+
+    juduls.sort((a, b) => a.localeCompare(b, 'id'));
+
+    if (keyword) {
+      const filtered = juduls.filter(j => j.toLowerCase().includes(keyword));
+      if (filtered.length > 0) return filtered;
+    }
+    return juduls;
+  }
+
+  function renderKbmJudulDropdownItems(filterByInputText) {
+    const dd = document.getElementById('kbmJudulDropdown');
+    if (!dd) return;
+    const juduls = getFilteredKbmJudulList(filterByInputText);
+
+    if (juduls.length === 0) {
+      dd.innerHTML = '<div class="px-3 py-2.5 text-xs text-slate-400 italic text-center">Belum ada riwayat judul materi yang tersimpan. Silakan ketik manual.</div>';
+      return;
+    }
+
+    dd.innerHTML = juduls.map(j => {
+      const safeAttr = j.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return `<div class="kbm-judul-item px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-teal-50 hover:text-teal-800 cursor-pointer transition flex items-center gap-2" data-judul="${safeAttr}">
+        <i class="fa-solid fa-book-open text-[10px] text-teal-600 shrink-0"></i>
+        <span class="truncate">${safeAttr}</span>
+      </div>`;
+    }).join('');
+  }
+
+  window.bukaKbmJudulDropdown = function(filterByInputText = false) {
+    const dd = document.getElementById('kbmJudulDropdown');
+    const chev = document.getElementById('kbmJudulChevron');
+    if (!dd) return;
+    renderKbmJudulDropdownItems(filterByInputText);
+    dd.classList.remove('hidden');
+    if (chev) chev.classList.add('rotate-180');
+    kbmJudulDropdownOpen = true;
   };
 
-  function bindKbmJudulFilters(){
-    ['kbmGuru','kbmMapel','kbmKelas'].forEach(id => {
+  window.tutupKbmJudulDropdown = function() {
+    const dd = document.getElementById('kbmJudulDropdown');
+    const chev = document.getElementById('kbmJudulChevron');
+    if (dd) dd.classList.add('hidden');
+    if (chev) chev.classList.remove('rotate-180');
+    kbmJudulDropdownOpen = false;
+  };
+
+  window.updateKbmJudulDatalist = function() {
+    if (kbmJudulDropdownOpen) {
+      renderKbmJudulDropdownItems(false);
+    }
+  };
+
+  function bindKbmJudulFilters() {
+    ['kbmGuru', 'kbmMapel', 'kbmKelas'].forEach(id => {
       const el = document.getElementById(id);
       if (el && !el.dataset.judulBound) {
         el.dataset.judulBound = '1';
-        el.addEventListener('change', window.updateKbmJudulDatalist);
+        el.addEventListener('change', () => {
+          if (kbmJudulDropdownOpen) renderKbmJudulDropdownItems(false);
+        });
       }
     });
+
     const inp = document.getElementById('kbmJudul');
+    const toggleBtn = document.getElementById('kbmJudulToggleBtn');
+    const dd = document.getElementById('kbmJudulDropdown');
+    const wrapper = document.getElementById('kbmJudulWrapper');
+
     if (inp && !inp.dataset.judulBound) {
       inp.dataset.judulBound = '1';
-      inp.addEventListener('focus', window.updateKbmJudulDatalist);
-      inp.addEventListener('click', window.updateKbmJudulDatalist);
+      inp.addEventListener('click', (e) => {
+        e.stopPropagation();
+        window.bukaKbmJudulDropdown(false);
+      });
+      inp.addEventListener('focus', () => {
+        window.bukaKbmJudulDropdown(false);
+      });
+      inp.addEventListener('input', () => {
+        window.bukaKbmJudulDropdown(true);
+      });
     }
+
+    if (toggleBtn && !toggleBtn.dataset.judulBound) {
+      toggleBtn.dataset.judulBound = '1';
+      toggleBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (kbmJudulDropdownOpen) {
+          window.tutupKbmJudulDropdown();
+        } else {
+          if (inp) inp.focus();
+          window.bukaKbmJudulDropdown(false);
+        }
+      });
+    }
+
+    if (dd && !dd.dataset.judulBound) {
+      dd.dataset.judulBound = '1';
+      dd.addEventListener('mousedown', (e) => {
+        // Cegah input kehilangan fokus sebelum item terpilih
+        e.preventDefault();
+      });
+      dd.addEventListener('click', (e) => {
+        const item = e.target.closest('.kbm-judul-item');
+        if (item && inp) {
+          const val = item.getAttribute('data-judul') || '';
+          inp.value = val;
+          inp.dispatchEvent(new Event('change', { bubbles: true }));
+          window.tutupKbmJudulDropdown();
+        }
+      });
+    }
+
+    document.addEventListener('mousedown', (e) => {
+      if (kbmJudulDropdownOpen && wrapper && !wrapper.contains(e.target)) {
+        window.tutupKbmJudulDropdown();
+      }
+    });
   }
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', bindKbmJudulFilters);
   } else {
     bindKbmJudulFilters();
   }
+})();
+</script>
+<script>
+(function() {
+  // ===== LOGIKA CEK KEPATUHAN JURNAL KBM (Terintegrasi dengan WORKER_PROXY_URL & Cache) =====
+  let jadwalData = {};
+  let jurnalArray = [];
+  let guruList = new Set();
+  let usedJurnalTracker = new Set();
+  let isJadwalLoaded = false;
+  let isJurnalLoaded = false;
+  let isFetchingProxy = false;
+
+  const START_DATE = new Date("2026-07-14T00:00:00");
+  const namaHariArr = ["Ahad", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+
+  const guruSelect = document.getElementById("cj_guruSelect");
+  const bulanSelect = document.getElementById("cj_bulanSelect");
+  const resultBody = document.getElementById("cj_resultBody");
+  const tableHead = document.getElementById("cj_tableHead");
+  const loading = document.getElementById("cj_loading");
+  const tableContainer = document.getElementById("cj_tableContainer");
+  const mainTitle = document.getElementById("cj_mainTitle");
+
+  const initialDayOfWeek = new Date().getDay();
+  if (mainTitle) {
+    if (initialDayOfWeek === 5) { mainTitle.textContent = "EVALUASI HARI KAMIS"; }
+    else if (initialDayOfWeek === 0) { mainTitle.textContent = "EVALUASI HARI SABTU"; }
+    else { mainTitle.textContent = "CEK KEPATUHAN JURNAL KBM"; }
+  }
+
+  startCountdown();
+
+  function getBlokWaktu(w) {
+    if (!w) return "";
+    if (w.includes("08.00") || w.includes("08.40")) return "1";
+    if (w.includes("09.35") || w.includes("10.15")) return "2";
+    if (w.includes("11.10") || w.includes("11.50")) return "3";
+    if (w.includes("13.30") || w.includes("14.10")) return "4";
+    return w;
+  }
+
+  window.syncCekJurnalJadwal = function(rawJadwal) {
+    const list = Array.isArray(rawJadwal) ? rawJadwal : (rawJadwal && typeof rawJadwal === 'object' ? Object.values(rawJadwal) : []);
+    if (!list || list.length === 0) return;
+
+    jadwalData = {};
+    guruList.clear();
+
+    list.forEach(item => {
+      if (!item || !item.namaGuru) return;
+      const guruName = String(item.namaGuru).trim();
+      const hari = String(item.hari || "").trim();
+      const mapel = String(item.namaMapel || "-").trim();
+      const kelas = String(item.kelas || "-").trim();
+      const waktuAsli = String(item.jamMasuk || "").trim();
+      const waktuBlok = getBlokWaktu(waktuAsli);
+      guruList.add(guruName);
+      if (!jadwalData[guruName]) jadwalData[guruName] = {};
+      if (!jadwalData[guruName][hari]) jadwalData[guruName][hari] = [];
+      const exists = jadwalData[guruName][hari].find(x => x.originalMapel === mapel && x.kelas === kelas && x.waktu === waktuBlok);
+      if (!exists) {
+        jadwalData[guruName][hari].push({ mapel: mapel, originalMapel: mapel, kelas: kelas, waktu: waktuBlok });
+      }
+    });
+
+    for (const guru in jadwalData) {
+      for (const hari in jadwalData[guru]) {
+        const frekuensi = {};
+        jadwalData[guru][hari].forEach(jadwal => {
+          const kunci = jadwal.kelas + "_" + jadwal.originalMapel;
+          frekuensi[kunci] = (frekuensi[kunci] || 0) + 1;
+        });
+        let sesiKe = 1;
+        jadwalData[guru][hari].forEach(jadwal => {
+          const kunci = jadwal.kelas + "_" + jadwal.originalMapel;
+          if (frekuensi[kunci] > 1) {
+            if (jadwal.waktu) { jadwal.mapel = `${jadwal.originalMapel} (${jadwal.waktu})`; }
+            else { jadwal.mapel = `${jadwal.originalMapel} (Sesi ${sesiKe})`; sesiKe++; }
+          }
+        });
+        jadwalData[guru][hari].sort((a, b) => {
+          let waktuA = a.waktu || "99";
+          let waktuB = b.waktu || "99";
+          return waktuA.localeCompare(waktuB);
+        });
+      }
+    }
+
+    updateGuruDropdown();
+    isJadwalLoaded = true;
+    checkReady();
+  };
+
+  window.syncCekJurnalData = function(rawJurnal) {
+    const list = Array.isArray(rawJurnal) ? rawJurnal : (rawJurnal && typeof rawJurnal === 'object' ? Object.values(rawJurnal) : []);
+    jurnalArray = [];
+    if (list && list.length > 0) {
+      list.forEach(item => {
+        if (!item || !item.guru || !item.tanggal) return;
+        jurnalArray.push({
+          tanggal: item.tanggal,
+          guru: item.guru,
+          mapel: item.mapel || "",
+          kelas: item.kelas || "",
+          timestamp: item.timestamp || 0
+        });
+      });
+    }
+    isJurnalLoaded = true;
+    checkReady();
+  };
+
+  function updateGuruDropdown() {
+    if (!guruSelect) return;
+    const currentVal = guruSelect.value;
+    guruSelect.innerHTML = '<option value="">-- Pilih Nama Anda --</option>';
+    const sortedGuru = Array.from(guruList).sort((a, b) => a.localeCompare(b, 'id'));
+    sortedGuru.forEach(guru => {
+      const opt = document.createElement("option");
+      opt.value = guru;
+      opt.textContent = guru;
+      guruSelect.appendChild(opt);
+    });
+    if (currentVal && sortedGuru.includes(currentVal)) guruSelect.value = currentVal;
+  }
+
+  function checkReady() {
+    if (isJadwalLoaded && isJurnalLoaded) {
+      if (loading) loading.style.display = "none";
+      if (tableContainer) tableContainer.style.display = "block";
+      handleRenderChoice();
+    }
+  }
+
+  function cleanText(str) { return (str || "").toString().toLowerCase().replace(/[^a-z0-9]/g, ''); }
+  function isMatchFlexible(str1, str2) {
+    const s1 = cleanText(str1), s2 = cleanText(str2);
+    if (!s1 || !s2) return false;
+    return s1.includes(s2) || s2.includes(s1);
+  }
+  function isMatchKelas(kelasJadwal, kelasRPP) {
+    let j = (kelasJadwal || "").toString().toLowerCase().trim();
+    let r = (kelasRPP || "").toString().toLowerCase().trim();
+    if (j === r) return true;
+    let numJ = j.match(/\d+/), numR = r.match(/\d+/);
+    if (numJ && numR && numJ[0] !== numR[0]) return false;
+    if (numJ && (numJ[0] === '10' || numJ[0] === '11' || numJ[0] === '12')) return true;
+    let cleanJ = j.replace(/\s+/g, ''), cleanR = r.replace(/\s+/g, '');
+    return cleanJ.includes(cleanR) || cleanR.includes(cleanJ);
+  }
+
+  function getStatusJurnal(targetDateStr, guruName, jadwalItem) {
+    const mapelTarget = jadwalItem.originalMapel || jadwalItem.mapel;
+    const matchedIndex = jurnalArray.findIndex((jurnal, index) => {
+      if (usedJurnalTracker.has(index)) return false;
+      if (jurnal.tanggal !== targetDateStr) return false;
+      return isMatchFlexible(guruName, jurnal.guru) && isMatchFlexible(mapelTarget, jurnal.mapel) && isMatchKelas(jadwalItem.kelas, jurnal.kelas);
+    });
+    if (matchedIndex === -1) return "NONE";
+    usedJurnalTracker.add(matchedIndex);
+    const matchedJurnal = jurnalArray[matchedIndex];
+    if (matchedJurnal.timestamp) {
+      const jamInput = new Date(matchedJurnal.timestamp).getHours();
+      if (jamInput >= 23 || jamInput < 8) return "LATE";
+    }
+    return "OK";
+  }
+
+  function handleRenderChoice() {
+    if (!guruSelect || !guruSelect.value) { renderRingkasanHarian(); }
+    else { renderTable(); }
+  }
+
+  function renderRingkasanHarian() {
+    if (!resultBody || !tableHead) return;
+    usedJurnalTracker.clear();
+    resultBody.innerHTML = "";
+    const now = new Date();
+    let targetDate = new Date();
+    const dayOfWeek = now.getDay();
+    if (dayOfWeek === 5 || dayOfWeek === 0) { targetDate.setDate(targetDate.getDate() - 1); }
+    tableHead.innerHTML = `<tr><th width="35%">Nama Guru</th><th width="15%" style="text-align:center;">Kelas</th><th width="35%">Mata Pelajaran</th><th width="15%" style="text-align:center;">Status</th></tr>`;
+    const year = targetDate.getFullYear();
+    const month = String(targetDate.getMonth() + 1).padStart(2, '0');
+    const date = String(targetDate.getDate()).padStart(2, '0');
+    const targetDateStr = `${year}-${month}-${date}`;
+    const targetDayName = namaHariArr[targetDate.getDay()];
+    let hasData = false;
+    const sortedGurus = Array.from(guruList).sort((a, b) => a.localeCompare(b, 'id'));
+    sortedGurus.forEach(guru => {
+      const jadwalTarget = (jadwalData[guru] && jadwalData[guru][targetDayName]) ? jadwalData[guru][targetDayName] : [];
+      jadwalTarget.forEach(jadwalItem => {
+        const status = getStatusJurnal(targetDateStr, guru, jadwalItem);
+        if (status === "NONE" || status === "LATE") {
+          hasData = true;
+          const labelSilang = status === "LATE" ? "❌<div style='font-size:9px; font-weight:normal; color:#dc2626;'>Lewat 23:00</div>" : "❌";
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td><strong>${guru}</strong></td><td style="text-align:center;">${jadwalItem.kelas}</td><td>${jadwalItem.mapel}</td><td class="cj-status cj-no">${labelSilang}</td>`;
+          resultBody.appendChild(tr);
+        }
+      });
+    });
+    if (!hasData) {
+      let noDataMsg = "Hebat! Hari ini semua guru sudah melengkapi jurnal. 🎉";
+      if (dayOfWeek === 5) noDataMsg = "Laporan hari Kamis, sebagai evaluasi bagi guru.";
+      else if (dayOfWeek === 0) noDataMsg = "Laporan hari Sabtu, sebagai evaluasi bagi guru.";
+      resultBody.innerHTML = `<tr><td colspan="4" class="cj-nodata">${noDataMsg}</td></tr>`;
+    }
+  }
+
+  function renderTable() {
+    if (!resultBody || !tableHead || !bulanSelect || !guruSelect) return;
+    usedJurnalTracker.clear();
+    resultBody.innerHTML = "";
+    tableHead.innerHTML = `<tr><th width="24%">Tanggal</th><th width="16%" style="text-align:center;">Kelas</th><th width="45%">Mata Pelajaran</th><th width="15%" style="text-align:center;">Status</th></tr>`;
+    const selectedBulan = bulanSelect.value;
+    const selectedGuru = guruSelect.value;
+    const [year, month] = selectedBulan.split('-');
+    const daysInMonth = new Date(year, month, 0).getDate();
+    let hasData = false;
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = `${year}-${month}-${String(d).padStart(2, '0')}`;
+      const currentDate = new Date(`${dateStr}T00:00:00`);
+      if (currentDate < START_DATE) continue;
+      const hariName = namaHariArr[currentDate.getDay()];
+      const jadwalHariIni = (jadwalData[selectedGuru] && jadwalData[selectedGuru][hariName]) ? jadwalData[selectedGuru][hariName] : [];
+      if (jadwalHariIni.length > 0) {
+        jadwalHariIni.forEach(jadwalItem => {
+          hasData = true;
+          const status = getStatusJurnal(dateStr, selectedGuru, jadwalItem);
+          let iconHTML = "";
+          if (status === "OK") iconHTML = `<td class="cj-status cj-ok">✅</td>`;
+          else if (status === "LATE") iconHTML = `<td class="cj-status cj-no" style="line-height:1;">❌<br><span style="font-size:9px; font-weight:normal;">(Lewat Waktu)</span></td>`;
+          else iconHTML = `<td class="cj-status cj-no">❌</td>`;
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${dateStr}</td><td style="text-align:center;"><strong>${jadwalItem.kelas}</strong></td><td>${jadwalItem.mapel}</td>${iconHTML}`;
+          resultBody.appendChild(tr);
+        });
+      }
+    }
+    if (!hasData) {
+      resultBody.innerHTML = `<tr><td colspan="4" class="cj-nodata">Tidak ada jadwal KBM untuk <b>${selectedGuru}</b> di bulan ini.</td></tr>`;
+    }
+  }
+
+  function startCountdown() {
+    const timeWarningBox = document.getElementById("cj_timeWarningBox");
+    const timeWarningText = document.getElementById("cj_timeWarningText");
+    if (!timeWarningBox || !timeWarningText) return;
+    setInterval(() => {
+      const now = new Date();
+      const dayOfWeek = now.getDay();
+      if (dayOfWeek === 0 || dayOfWeek === 5) { timeWarningBox.style.display = "none"; return; }
+      else { timeWarningBox.style.display = "block"; }
+      const target = new Date();
+      target.setHours(23, 0, 0, 0);
+      const diff = target - now;
+      if (diff <= 0) {
+        timeWarningBox.className = "cj-time-box closed";
+        timeWarningText.innerHTML = "Sudah Pkl. 23:00 WIB. Input jurnal KBM hari ini <strong>Ditutup</strong>.";
+      } else {
+        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((diff / 1000 / 60) % 60);
+        const seconds = Math.floor((diff / 1000) % 60);
+        const hStr = String(hours).padStart(2, '0'), mStr = String(minutes).padStart(2, '0'), sStr = String(seconds).padStart(2, '0');
+        timeWarningBox.className = "cj-time-box";
+        timeWarningText.innerHTML = `Sisa Waktu Input Jurnal: <strong>${hStr} Jam ${mStr} Menit ${sStr} Detik</strong>`;
+      }
+    }, 1000);
+  }
+
+  window.muatCekJurnal = async function() {
+    if (window.globalJadwalKBM && window.globalJadwalKBM.length > 0 && !isJadwalLoaded) {
+      window.syncCekJurnalJadwal(window.globalJadwalKBM);
+    }
+    if (window.rekapAllData && window.rekapAllData.length > 0 && !isJurnalLoaded) {
+      window.syncCekJurnalData(window.rekapAllData);
+    }
+    if (isJadwalLoaded && isJurnalLoaded) {
+      checkReady();
+      return;
+    }
+    if (isFetchingProxy) return;
+    isFetchingProxy = true;
+    const proxyUrl = window.WORKER_PROXY_URL || "https://proxy-biodata-jurnal.nurwalad88.workers.dev/";
+    try {
+      if (!isJadwalLoaded) {
+        try {
+          const rJadwal = await fetch(proxyUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ db: "biodata", action: "get", path: "jam_mapel" })
+          }).then(r => r.json());
+          if (rJadwal && rJadwal.data) {
+            window.syncCekJurnalJadwal(rJadwal.data);
+          } else {
+            const cachedJ = JSON.parse(localStorage.getItem('izy_jadwal_kbm_cache') || '[]');
+            if (cachedJ.length > 0) window.syncCekJurnalJadwal(cachedJ);
+          }
+        } catch (e) {
+          try {
+            const cachedJ = JSON.parse(localStorage.getItem('izy_jadwal_kbm_cache') || '[]');
+            if (cachedJ.length > 0) window.syncCekJurnalJadwal(cachedJ);
+          } catch (err) {}
+        }
+      }
+      if (!isJurnalLoaded) {
+        try {
+          const rJurnal = await fetch(proxyUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ db: "jurnal", action: "get", path: "jurnal" })
+          }).then(r => r.json());
+          if (rJurnal && rJurnal.data) {
+            window.syncCekJurnalData(rJurnal.data);
+          } else {
+            const cachedR = JSON.parse(localStorage.getItem('izy_rekap_jurnal_cache') || '[]');
+            window.syncCekJurnalData(cachedR);
+          }
+        } catch (e) {
+          let cachedR = [];
+          try { cachedR = JSON.parse(localStorage.getItem('izy_rekap_jurnal_cache') || '[]'); } catch (err) {}
+          window.syncCekJurnalData(cachedR);
+        }
+      }
+    } finally {
+      isFetchingProxy = false;
+    }
+  };
+
+  if (guruSelect) guruSelect.addEventListener("change", handleRenderChoice);
+  if (bulanSelect) bulanSelect.addEventListener("change", () => { if (guruSelect && guruSelect.value) { renderTable(); } else { renderRingkasanHarian(); } });
+
+  // Jalankan inisialisasi awal
+  setTimeout(() => { window.muatCekJurnal(); }, 400);
 })();
 </script>
 </body>
