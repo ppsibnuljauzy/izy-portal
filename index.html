@@ -2517,7 +2517,7 @@
 
               const gabung = sample.join(' | ');
               let label = headers[c] || ('Kolom ' + (c + 1));
-              if (/^column\s*9$/i.test(String(label).trim())) label = 'Minat';
+              if (/^column\s*9$/i.test(String(label).trim())) label = 'Minta';
               let role = 'lain';
 
               if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(sample[0])) { label = 'Waktu Daftar'; role = 'waktu'; }
@@ -3294,9 +3294,9 @@
                     </div>
                     <h3 class="text-xs font-black text-slate-800 uppercase tracking-wide mb-1">Absensi KBM Santri</h3>
                     <p class="text-[10px] text-slate-500 font-medium mb-4 flex-1">Unduh akumulasi persentase kehadiran sekolah per kelas dalam setahun.</p>
-                    <a href="https://6a916cf22688d4c94722bd6b--ornate-kataifi-379172.netlify.app/" target="_blank" class="block w-full py-2 bg-teal-700 hover:bg-teal-800 text-white font-bold rounded-lg text-center text-[10px] uppercase tracking-wider transition shadow-sm">
-                      <i class="fa-solid fa-download mr-1"></i> Buka Link
-                    </a>
+                    <button type="button" onclick="mintaPasswordDownloadKbm('absensi_kbm')" class="block w-full py-2 bg-teal-700 hover:bg-teal-800 text-white font-bold rounded-lg text-center text-[10px] uppercase tracking-wider transition shadow-sm cursor-pointer">
+                      <i class="fa-solid fa-lock mr-1"></i> Buka Link
+                    </button>
                   </div>
 
                   <!-- Card 3: Amal Yaumi Santri -->
@@ -3342,9 +3342,9 @@
                     </div>
                     <h3 class="text-xs font-black text-slate-800 uppercase tracking-wide mb-1">Jurnal Guru KBM</h3>
                     <p class="text-[10px] text-slate-500 font-medium mb-4 flex-1">Print-out tabel silabus dan materi yang diajarkan oleh guru di kelas.</p>
-                    <a href="https://6afb42b7669dea765332021f--animated-licorice-af355c.netlify.app/" target="_blank" class="block w-full py-2 bg-teal-700 hover:bg-teal-800 text-white font-bold rounded-lg text-center text-[10px] uppercase tracking-wider transition shadow-sm">
-                      <i class="fa-solid fa-download mr-1"></i> Buka Link
-                    </a>
+                    <button type="button" onclick="mintaPasswordDownloadKbm('jurnal_kbm')" class="block w-full py-2 bg-teal-700 hover:bg-teal-800 text-white font-bold rounded-lg text-center text-[10px] uppercase tracking-wider transition shadow-sm cursor-pointer">
+                      <i class="fa-solid fa-lock mr-1"></i> Buka Link
+                    </button>
                   </div>
 
                   <!-- Card 7: Mata Pelajaran (Roster) -->
@@ -3378,9 +3378,9 @@
                     </div>
                     <h3 class="text-xs font-black text-slate-800 uppercase tracking-wide mb-1">Rapor & Nilai KBM</h3>
                     <p class="text-[10px] text-slate-500 font-medium mb-4 flex-1">Generate halaman cetak nilai akademik PH, PTS, PAS, dan Buku Rapor.</p>
-                    <a href="https://6ab0ae3842f408c22d5f45f3--rad-kitten-45ce25.netlify.app/" target="_blank" class="block w-full py-2 bg-teal-700 hover:bg-teal-800 text-white font-bold rounded-lg text-center text-[10px] uppercase tracking-wider transition shadow-sm">
-                      <i class="fa-solid fa-download mr-1"></i> Buka Link
-                    </a>
+                    <button type="button" onclick="mintaPasswordDownloadKbm('rapor_kbm')" class="block w-full py-2 bg-teal-700 hover:bg-teal-800 text-white font-bold rounded-lg text-center text-[10px] uppercase tracking-wider transition shadow-sm cursor-pointer">
+                      <i class="fa-solid fa-lock mr-1"></i> Buka Link
+                    </button>
                   </div>
 
                   <!-- Card 10: Soal Ujian (Bank Soal) - Export Excel Langsung -->
@@ -7912,6 +7912,96 @@
         });
       } catch (e) { return null; }
     }
+
+    const _DOWNLOAD_KBM_LINKS = {
+      absensi_kbm: {
+        label: "Absensi KBM Santri",
+        url: "https://6a916cf22688d4c94722bd6b--ornate-kataifi-379172.netlify.app/"
+      },
+      jurnal_kbm: {
+        label: "Jurnal Guru KBM",
+        url: "https://6afb42b7669dea765332021f--animated-licorice-af355c.netlify.app/"
+      },
+      rapor_kbm: {
+        label: "Rapor & Nilai KBM",
+        url: "https://6ab0ae3842f408c22d5f45f3--rad-kitten-45ce25.netlify.app/"
+      }
+    };
+
+    window.mintaPasswordDownloadKbm = async function(kodeFitur) {
+      const item = _DOWNLOAD_KBM_LINKS[kodeFitur];
+      if (!item) return;
+      const { value: passOk } = await Swal.fire({
+        title: 'OTORISASI AKSES',
+        icon: 'lock',
+        input: 'password',
+        inputPlaceholder: 'Masukkan password...',
+        inputAttributes: { autocapitalize: 'off', autocorrect: 'off', spellcheck: 'false' },
+        showCancelButton: true,
+        confirmButtonText: 'Buka Link',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#0f766e',
+        showLoaderOnConfirm: true,
+        preConfirm: async (pwd) => {
+          const inputClean = String(pwd || '').trim();
+          if (!inputClean) {
+            Swal.showValidationMessage('Password wajib diisi.');
+            return false;
+          }
+          try {
+            const allowed = new Set();
+            const candidateKeys = [
+              "Ust_ Nur Walad, S_Pd_I_, C_PQI_, C_EQL_",
+              "UUst_ Nur Walad, S_Pd_I_, C_PQI_, C_EQL_",
+              "Ust. Nur Walad, S.Pd.I., C.PQI., C.EQL."
+            ];
+            candidateKeys.forEach(k => {
+              if (globalPasswordStaf && globalPasswordStaf[k]) {
+                allowed.add(String(globalPasswordStaf[k]).trim());
+              }
+            });
+            for (const k in (globalPasswordStaf || {})) {
+              if (k.toLowerCase().includes("nur walad") && globalPasswordStaf[k]) {
+                allowed.add(String(globalPasswordStaf[k]).trim());
+              }
+            }
+            if (allowed.size === 0) {
+              const snap = await apiGet("biodata", "password_staf");
+              const obj = (snap && typeof snap.exists === 'function' && snap.exists()) ? (snap.val() || {}) : {};
+              candidateKeys.forEach(k => {
+                const v = obj[k];
+                if (typeof v === 'object' && v !== null && v.password) allowed.add(String(v.password).trim());
+                else if (v !== undefined && v !== null && String(v).trim() !== '') allowed.add(String(v).trim());
+              });
+              Object.keys(obj).forEach(k => {
+                const v = obj[k];
+                const namaAsli = (v && typeof v === 'object' && v.namaAsli) ? String(v.namaAsli) : '';
+                if (k.toLowerCase().includes("nur walad") || namaAsli.toLowerCase().includes("nur walad")) {
+                  if (typeof v === 'object' && v !== null && v.password) allowed.add(String(v.password).trim());
+                  else if (typeof v === 'string' && v.trim() !== '') allowed.add(v.trim());
+                }
+              });
+            }
+            if (allowed.size === 0) {
+              Swal.showValidationMessage('Data password staf belum tersedia di Firebase.');
+              return false;
+            }
+            if (!allowed.has(inputClean)) {
+              Swal.showValidationMessage('Password salah! Hanya Ust. Nur Walad, S.Pd.I., C.PQI., C.EQL. yang berwenang membuka link ini.');
+              return false;
+            }
+            return true;
+          } catch (e) {
+            Swal.showValidationMessage('Gagal verifikasi password: ' + (e && e.message ? e.message : e));
+            return false;
+          }
+        },
+        allowOutsideClick: () => !Swal.isLoading()
+      });
+      if (passOk) {
+        window.open(item.url, '_blank');
+      }
+    };
 
     window.mintaPasswordSoal = async function() {
       const { value: passOk } = await Swal.fire({
