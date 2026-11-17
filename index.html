@@ -436,6 +436,9 @@
             <button id="tabBtnRekapKbm" onclick="pindahMenu('rekapKbm')" class="nav-btn w-full text-left p-2 rounded-lg text-xs font-semibold text-teal-200 flex items-center gap-2">
               <i class="fa-solid fa-table-list w-4 text-center"></i> Rekap Jurnal KBM
             </button>
+            <button id="tabBtnCekJurnal" onclick="pindahMenu('cekJurnal')" class="nav-btn w-full text-left p-2 rounded-lg text-xs font-semibold text-teal-200 flex items-center gap-2">
+              <i class="fa-solid fa-circle-check w-4 text-center"></i> Cek Jurnal KBM
+            </button>
             <button id="tabBtnRekapNilai" onclick="pindahMenu('rekapNilai')" class="nav-btn w-full text-left p-2 rounded-lg text-xs font-semibold text-teal-200 flex items-center gap-2">
               <i class="fa-solid fa-file-signature w-4 text-center"></i> Rekap Nilai Mapel
             </button>
@@ -1723,6 +1726,53 @@
           </section>
 
           <!-- ========================================== -->
+          <!-- ========================================== -->
+          <!-- PANEL: CEK KEPATUHAN JURNAL KBM            -->
+          <!-- (data via Worker Proxy — URL database    -->
+          <!--  jurnal disembunyikan di sisi worker)    -->
+          <!-- ========================================== -->
+          <section id="panelCekJurnal" class="w-full hidden animate-[fadeIn_0.3s_ease-in-out]">
+            <div class="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden flex flex-col h-[calc(100vh-4.5rem)]">
+              <div class="bg-gradient-to-r from-teal-900 to-teal-700 px-5 py-2.5 flex justify-between items-center text-white shrink-0">
+                <div>
+                  <h2 id="cj_title" class="text-xs font-black tracking-widest uppercase">Cek Kepatuhan Jurnal KBM</h2>
+                  <p class="text-[9px] text-teal-100 font-medium">Pantau guru yang belum / terlambat mengisi jurnal mengajar</p>
+                </div>
+                <button type="button" onclick="cj_muatUlang()" class="bg-amber-500 hover:bg-amber-600 text-white px-2.5 py-1 rounded text-[9px] uppercase font-bold tracking-wider transition shadow flex items-center gap-1"><i class="fa-solid fa-rotate"></i> Muat Ulang</button>
+              </div>
+
+              <div class="p-4 flex flex-col flex-1 overflow-hidden bg-slate-50/50">
+                <div class="overflow-y-auto flex-1 flex flex-col gap-3 pr-1">
+
+                  <!-- Peringatan sisa waktu -->
+                  <div id="cj_timeWarning" class="bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold px-3 py-2 rounded-lg text-center shrink-0">Menghitung sisa waktu...</div>
+
+                  <!-- Filter bulan & guru -->
+                  <div class="flex flex-col sm:flex-row gap-2 shrink-0">
+                    <select id="cj_bulanSelect" class="flex-1 p-2 text-xs border border-slate-300 rounded-md bg-white font-bold text-slate-700 outline-none focus:ring-1 focus:ring-teal-600 shadow-sm"></select>
+                    <select id="cj_guruSelect" class="flex-1 p-2 text-xs border border-slate-300 rounded-md bg-white font-bold text-slate-700 outline-none focus:ring-1 focus:ring-teal-600 shadow-sm">
+                      <option value="">-- Semua Guru (Ringkasan Hari Ini) --</option>
+                    </select>
+                  </div>
+
+                  <!-- Loading -->
+                  <div id="cj_loading" class="text-center py-10 text-teal-700 font-bold text-xs"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Memuat data dari database...</div>
+
+                  <!-- Tabel hasil -->
+                  <div id="cj_tableContainer" class="hidden bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden shrink-0">
+                    <div class="overflow-x-auto">
+                      <table class="w-full text-xs text-left">
+                        <thead id="cj_tableHead" class="bg-teal-700 text-white text-[10px] uppercase font-bold"></thead>
+                        <tbody id="cj_resultBody" class="divide-y divide-slate-100 text-slate-700"></tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </section>
+
           <!-- 8. PANEL: REKAP SETORAN TAHFIZH            -->
           <!-- ========================================== -->
           <section id="panelRekapTahfizh" class="w-full hidden animate-[fadeIn_0.3s_ease-in-out]">
@@ -3779,7 +3829,7 @@
       const panels = [
         'panelBeranda', 'panelInputSoal', 'panelDaftarSoal', 'panelSettingSoal',
         'panelSetoran', 'panelInputKbm', 'panelNilaiKbm', 'panelAbsenKbm', 'panelAbsenKst', 'panelAdab',
-        'panelRekapKbm', 'panelRekapTahfizh', 'panelRekapNilai', 'panelRekapAbsenKbm', 'panelRekapAdab', 'panelRekapKinerja', 'panelCekInputNilai', 'panelRekapPrestasi', 'panelProfilData', 'panelRosterMapel', 'panelRankingKelas', 'panelKlasemenAdab', 'panelRekapTasmi', 'panelInputTasmi', 'panelCapaianTahfizh', 'panelBelumSetoran', 'panelDownload', 'panelInbox', 'panelUjian', 'panelKontrolUjian', 'panelKaldik', 'panelDaftar'
+        'panelRekapKbm', 'panelCekJurnal', 'panelRekapTahfizh', 'panelRekapNilai', 'panelRekapAbsenKbm', 'panelRekapAdab', 'panelRekapKinerja', 'panelCekInputNilai', 'panelRekapPrestasi', 'panelProfilData', 'panelRosterMapel', 'panelRankingKelas', 'panelKlasemenAdab', 'panelRekapTasmi', 'panelInputTasmi', 'panelCapaianTahfizh', 'panelBelumSetoran', 'panelDownload', 'panelInbox', 'panelUjian', 'panelKontrolUjian', 'panelKaldik', 'panelDaftar'
       ];
       panels.forEach(p => {
         const el = document.getElementById(p);
@@ -3789,7 +3839,7 @@
       const tabs = [
         'tabBtnBeranda', 'tabBtnInputSoal', 'tabBtnDaftarSoal', 'tabBtnSettingSoal',
         'tabBtnSetoran', 'tabBtnInputKbm', 'tabBtnNilaiKbm', 'tabBtnAbsenKbm', 'tabBtnAbsenKst', 'tabBtnAdab',
-        'tabBtnRekapKbm', 'tabBtnRekapTahfizh', 'tabBtnRekapNilai', 'tabBtnRekapAbsenKbm', 'tabBtnRekapAdab', 'tabBtnRekapKinerja', 'tabBtnCekInputNilai', 'tabBtnRekapPrestasi', 'tabBtnProfilData', 'tabBtnRosterMapel', 'tabBtnRankingKelas', 'tabBtnKlasemenAdab', 'tabBtnRekapTasmi', 'tabBtnInputTasmi', 'tabBtnCapaianTahfizh', 'tabBtnBelumSetoran', 'tabBtnDownload', 'tabBtnInbox', 'tabBtnUjian', 'tabBtnKontrolUjian', 'tabBtnKaldik', 'tabBtnDaftar'
+        'tabBtnRekapKbm', 'tabBtnCekJurnal', 'tabBtnRekapTahfizh', 'tabBtnRekapNilai', 'tabBtnRekapAbsenKbm', 'tabBtnRekapAdab', 'tabBtnRekapKinerja', 'tabBtnCekInputNilai', 'tabBtnRekapPrestasi', 'tabBtnProfilData', 'tabBtnRosterMapel', 'tabBtnRankingKelas', 'tabBtnKlasemenAdab', 'tabBtnRekapTasmi', 'tabBtnInputTasmi', 'tabBtnCapaianTahfizh', 'tabBtnBelumSetoran', 'tabBtnDownload', 'tabBtnInbox', 'tabBtnUjian', 'tabBtnKontrolUjian', 'tabBtnKaldik', 'tabBtnDaftar'
       ];
       tabs.forEach(t => {
         const el = document.getElementById(t);
@@ -3882,11 +3932,18 @@
         document.getElementById('tabBtnRekapKbm').classList.add('active');
         titleEl.innerText = 'Rekap Jurnal KBM';
         iconEl.className = 'fa-solid fa-table-list text-teal-600 text-base';
+      } else if (menu === 'cekJurnal') {
+        document.getElementById('panelCekJurnal').classList.remove('hidden');
+        document.getElementById('tabBtnCekJurnal').classList.add('active');
+        titleEl.innerText = 'Cek Kepatuhan Jurnal KBM';
+        iconEl.className = 'fa-solid fa-circle-check text-teal-600 text-base';
+        if (typeof window.muatCekJurnal === 'function') window.muatCekJurnal();
       } else if (menu === 'rekapTahfizh') {
         document.getElementById('panelRekapTahfizh').classList.remove('hidden');
         document.getElementById('tabBtnRekapTahfizh').classList.add('active');
         titleEl.innerText = 'Setoran Harian';
         iconEl.className = 'fa-solid fa-book-open-reader text-teal-600 text-base';
+        if (typeof window.muatRekapSetoran === 'function') window.muatRekapSetoran();
       } else if (menu === 'rekapTasmi') {
         document.getElementById('panelRekapTasmi').classList.remove('hidden');
         document.getElementById('tabBtnRekapTasmi').classList.add('active');
@@ -5998,6 +6055,8 @@
     ['filterTahfizhJenis', 'filterTahfizhBulan', 'filterTahfizhTahun', 'searchTahfizhSantri'].forEach(id => {
       document.getElementById(id).addEventListener("input", filterRekapTahfizh);
     });
+    // Dipanggil saat menu Rekap Setoran dibuka (lazy render ulang)
+    window.muatRekapSetoran = () => { try { filterRekapTahfizh(); } catch(e){ console.error(e); } };
 
     document.getElementById("btnPrevTahfizh").onclick = () => { 
       if(currentSetoranPage > 1) { currentSetoranPage--; renderTabelTahfizh(filteredSetoranData); }
@@ -8424,6 +8483,10 @@
           return tglB - tglA;
         });
         filterRekapTahfizh();
+      }, (err) => {
+        console.error("dbSetoran onValue error:", err);
+        const tb = document.getElementById("tabelTahfizhBody");
+        if (tb) tb.innerHTML = `<tr><td colspan="8" class="p-6 text-red-500 font-medium italic">Gagal terhubung ke database setoran (${(err && err.message) ? err.message : "database tidak ditemukan"}). Hubungi admin untuk memperbarui URL database.</td></tr>`;
       });
 
       window.loadMapelListRekapNilai();
@@ -10006,6 +10069,10 @@ let inboxSesiAktifNamaID = "";
       loadingArea.classList.add("hidden");
       switchViewCT('rekap');
       renderUstadzTableCT(ustadzRekap);
+    }, (err) => {
+      console.error("dbSetoran capaian onValue error:", err);
+      const la = document.getElementById("ct_loadingArea");
+      if (la) la.innerHTML = `<div class="py-10 text-red-500 text-xs text-center px-4"><i class="fa-solid fa-triangle-exclamation mb-2 block text-lg"></i>Gagal terhubung ke database setoran (${(err && err.message) ? err.message : "database tidak ditemukan"}).<br>Hubungi admin untuk memperbarui URL database.</div>`;
     });
   };
 
@@ -10039,7 +10106,10 @@ let inboxSesiAktifNamaID = "";
       try {
         const [biodataSnap, setoranSnap] = await Promise.all([
           apiGet("biodata", "identitas_santri"),
-          get(query(ref(dbSetoran, 'setoran_bacaan')))
+          Promise.race([
+            get(query(ref(dbSetoran, 'setoran_bacaan'))),
+            new Promise((_, rej) => setTimeout(() => rej(new Error("timeout: database setoran tidak merespon (>25 detik)")), 25000))
+          ])
         ]);
         container.innerHTML = "";
         let dataKelompok = {};
@@ -10126,6 +10196,290 @@ let inboxSesiAktifNamaID = "";
     }
     fetchDataBS();
   };
+
+  // ============================================================
+  // CEK KEPATUHAN JURNAL KBM (menu baru di bawah REKAP SEKOLAH)
+  // Sumber data via WORKER PROXY:
+  //   - db="biodata" path "jam_mapel"  -> jadwal mengajar guru
+  //   - db="jurnal"  path "jurnal"      -> input jurnal KBM
+  // URL database jurnal disembunyikan di dalam Worker (tidak tampil di HTML).
+  // ============================================================
+  let cj_jadwalData = {};
+  let cj_guruList = [];
+  let cj_jurnalArray = [];
+  const CJ_START_DATE = new Date("2026-07-14T00:00:00");
+  const CJ_NAMA_HARI = ["Ahad", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+  let cj_countdownTimer = null;
+
+  function cj_getBlokWaktu(w) {
+    if (!w) return "";
+    if (w.includes("08.00") || w.includes("08.40")) return "1";
+    if (w.includes("09.35") || w.includes("10.15")) return "2";
+    if (w.includes("11.10") || w.includes("11.50")) return "3";
+    if (w.includes("13.30") || w.includes("14.10")) return "4";
+    return w;
+  }
+  function cj_cleanText(str) { return (str || "").toString().toLowerCase().replace(/[^a-z0-9]/g, ''); }
+  function cj_isMatchFlexible(a, b) {
+    const s1 = cj_cleanText(a), s2 = cj_cleanText(b);
+    if (!s1 || !s2) return false;
+    return s1.includes(s2) || s2.includes(s1);
+  }
+  function cj_isMatchKelas(kelasJadwal, kelasJurnal) {
+    let j = (kelasJadwal || "").toString().toLowerCase().trim();
+    let r = (kelasJurnal || "").toString().toLowerCase().trim();
+    if (j === r) return true;
+    let numJ = j.match(/\d+/), numR = r.match(/\d+/);
+    if (numJ && numR && numJ[0] !== numR[0]) return false;
+    if (numJ && (numJ[0] === '10' || numJ[0] === '11' || numJ[0] === '12')) return true;
+    let cj = j.replace(/\s+/g, ''), cr = r.replace(/\s+/g, '');
+    return cj.includes(cr) || cr.includes(cj);
+  }
+  function cj_getStatusJurnal(targetDateStr, guruName, jadwalItem, usedTracker) {
+    const mapelTarget = jadwalItem.originalMapel || jadwalItem.mapel;
+    const matchedIndex = cj_jurnalArray.findIndex((jurnal, index) => {
+      if (usedTracker.has(index)) return false;
+      if (jurnal.tanggal !== targetDateStr) return false;
+      return cj_isMatchFlexible(guruName, jurnal.guru)
+          && cj_isMatchFlexible(mapelTarget, jurnal.mapel)
+          && cj_isMatchKelas(jadwalItem.kelas, jurnal.kelas);
+    });
+    if (matchedIndex === -1) return "NONE";
+    usedTracker.add(matchedIndex);
+    const mj = cj_jurnalArray[matchedIndex];
+    if (mj.timestamp) {
+      const jamInput = new Date(mj.timestamp).getHours();
+      if (jamInput >= 23 || jamInput < 8) return "LATE";
+    }
+    return "OK";
+  }
+  function cj_bulanOptions() {
+    const bln = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+    const opts = [];
+    const cur = new Date(2026, 6, 1); // mulai Juli 2026
+    const now = new Date();
+    const end = new Date(now.getFullYear(), now.getMonth() + 2, 1);
+    while (cur <= end) {
+      const v = cur.getFullYear() + "-" + String(cur.getMonth() + 1).padStart(2, '0');
+      opts.push({ v: v, label: bln[cur.getMonth()] + " " + cur.getFullYear() });
+      cur.setMonth(cur.getMonth() + 1);
+    }
+    return opts;
+  }
+
+  async function cj_fetchAndRender() {
+    const loading = document.getElementById('cj_loading');
+    const container = document.getElementById('cj_tableContainer');
+    if (loading) { loading.style.display = 'block'; loading.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Memuat data dari database...'; }
+    if (container) container.classList.add('hidden');
+    try {
+      const [jadwalSnap, jurnalSnap] = await Promise.all([
+        apiGet("biodata", "jam_mapel"),
+        apiGet("jurnal", "jurnal")
+      ]);
+
+      cj_jadwalData = {};
+      const guruSet = new Set();
+      if (jadwalSnap.exists()) {
+        jadwalSnap.forEach(child => {
+          const item = child.val();
+          if (!item || !item.namaGuru) return;
+          const guruName = item.namaGuru;
+          const hari = item.hari;
+          const mapel = item.namaMapel || "-";
+          const kelas = item.kelas || "-";
+          const waktuBlok = cj_getBlokWaktu(item.jamMasuk || "");
+          guruSet.add(guruName);
+          if (!cj_jadwalData[guruName]) cj_jadwalData[guruName] = {};
+          if (!cj_jadwalData[guruName][hari]) cj_jadwalData[guruName][hari] = [];
+          const exists = cj_jadwalData[guruName][hari].find(x => x.originalMapel === mapel && x.kelas === kelas && x.waktu === waktuBlok);
+          if (!exists) cj_jadwalData[guruName][hari].push({ mapel: mapel, originalMapel: mapel, kelas: kelas, waktu: waktuBlok });
+        });
+        for (const guru in cj_jadwalData) {
+          for (const hari in cj_jadwalData[guru]) {
+            const frekuensi = {};
+            cj_jadwalData[guru][hari].forEach(j => { const k = j.kelas + "_" + j.originalMapel; frekuensi[k] = (frekuensi[k] || 0) + 1; });
+            let sesiKe = 1;
+            cj_jadwalData[guru][hari].forEach(j => {
+              const k = j.kelas + "_" + j.originalMapel;
+              if (frekuensi[k] > 1) {
+                if (j.waktu) j.mapel = j.originalMapel + " (" + j.waktu + ")";
+                else { j.mapel = j.originalMapel + " (Sesi " + sesiKe + ")"; sesiKe++; }
+              }
+            });
+            cj_jadwalData[guru][hari].sort((a, b) => (a.waktu || "99").localeCompare(b.waktu || "99"));
+          }
+        }
+      }
+      cj_guruList = Array.from(guruSet).sort();
+
+      cj_jurnalArray = [];
+      if (jurnalSnap.exists()) {
+        jurnalSnap.forEach(child => {
+          const item = child.val();
+          if (!item || !item.guru || !item.tanggal) return;
+          cj_jurnalArray.push({ tanggal: item.tanggal, guru: item.guru, mapel: item.mapel || "", kelas: item.kelas || "", timestamp: item.timestamp || 0 });
+        });
+      }
+
+      const guruSel = document.getElementById('cj_guruSelect');
+      if (guruSel) {
+        const curVal = guruSel.value;
+        guruSel.innerHTML = '<option value="">-- Semua Guru (Ringkasan Hari Ini) --</option>';
+        cj_guruList.forEach(g => {
+          const o = document.createElement('option'); o.value = g; o.textContent = g; guruSel.appendChild(o);
+        });
+        if (curVal && cj_guruList.indexOf(curVal) !== -1) guruSel.value = curVal;
+      }
+
+      if (loading) loading.style.display = 'none';
+      if (container) container.classList.remove('hidden');
+      cj_render();
+    } catch (e) {
+      console.error("Cek Jurnal error:", e);
+      if (loading) loading.innerHTML = '<span class="text-red-500"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Gagal memuat data: ' + e.message + '. Klik "Muat Ulang".</span>';
+    }
+  }
+
+  function cj_render() {
+    const guruSel = document.getElementById('cj_guruSelect');
+    const selectedGuru = guruSel ? guruSel.value : "";
+    if (!selectedGuru) cj_renderRingkasan(); else cj_renderTabelGuru(selectedGuru);
+  }
+
+  function cj_renderRingkasan() {
+    const usedTracker = new Set();
+    const tbody = document.getElementById('cj_resultBody');
+    const thead = document.getElementById('cj_tableHead');
+    if (!tbody || !thead) return;
+    tbody.innerHTML = "";
+    thead.innerHTML = '<tr><th class="py-2 px-3">Nama Guru</th><th class="py-2 px-2 text-center">Kelas</th><th class="py-2 px-3">Mata Pelajaran</th><th class="py-2 px-2 text-center">Status</th></tr>';
+
+    const now = new Date();
+    let targetDate = new Date();
+    const dayOfWeek = now.getDay();
+    if (dayOfWeek === 5 || dayOfWeek === 0) targetDate.setDate(targetDate.getDate() - 1);
+    const y = targetDate.getFullYear(), m = String(targetDate.getMonth() + 1).padStart(2, '0'), d = String(targetDate.getDate()).padStart(2, '0');
+    const targetDateStr = y + "-" + m + "-" + d;
+    const targetDayName = CJ_NAMA_HARI[targetDate.getDay()];
+
+    let hasData = false;
+    cj_guruList.forEach(guru => {
+      const list = (cj_jadwalData[guru] && cj_jadwalData[guru][targetDayName]) ? cj_jadwalData[guru][targetDayName] : [];
+      list.forEach(jadwalItem => {
+        const status = cj_getStatusJurnal(targetDateStr, guru, jadwalItem, usedTracker);
+        if (status === "NONE" || status === "LATE") {
+          hasData = true;
+          const label = status === "LATE"
+            ? '❌ <span style="font-size:9px;color:#dc2626;font-weight:normal;">(Lewat 23:00)</span>'
+            : '❌';
+          const tr = document.createElement('tr');
+          tr.innerHTML = '<td class="py-2 px-3 font-bold text-slate-700">' + guru + '</td>'
+                       + '<td class="py-2 px-2 text-center text-slate-600">' + jadwalItem.kelas + '</td>'
+                       + '<td class="py-2 px-3 text-slate-600">' + jadwalItem.mapel + '</td>'
+                       + '<td class="py-2 px-2 text-center font-bold text-red-500">' + label + '</td>';
+          tbody.appendChild(tr);
+        }
+      });
+    });
+    if (!hasData) {
+      tbody.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-emerald-600 font-bold italic">Hebat! Semua guru sudah melengkapi jurnal. 🎉</td></tr>';
+    }
+  }
+
+  function cj_renderTabelGuru(selectedGuru) {
+    const usedTracker = new Set();
+    const tbody = document.getElementById('cj_resultBody');
+    const thead = document.getElementById('cj_tableHead');
+    if (!tbody || !thead) return;
+    tbody.innerHTML = "";
+    thead.innerHTML = '<tr><th class="py-2 px-3">Tanggal</th><th class="py-2 px-2 text-center">Kelas</th><th class="py-2 px-3">Mata Pelajaran</th><th class="py-2 px-2 text-center">Status</th></tr>';
+
+    const bulanSel = document.getElementById('cj_bulanSelect');
+    const selectedBulan = bulanSel ? bulanSel.value : "";
+    if (!selectedBulan) { tbody.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-slate-400 italic">Pilih bulan terlebih dahulu.</td></tr>'; return; }
+    const parts = selectedBulan.split('-');
+    const year = parts[0], month = parts[1];
+    const daysInMonth = new Date(year, month, 0).getDate();
+    let hasData = false;
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = year + "-" + month + "-" + String(d).padStart(2, '0');
+      const cur = new Date(dateStr + "T00:00:00");
+      if (cur < CJ_START_DATE) continue;
+      const hariName = CJ_NAMA_HARI[cur.getDay()];
+      const list = (cj_jadwalData[selectedGuru] && cj_jadwalData[selectedGuru][hariName]) ? cj_jadwalData[selectedGuru][hariName] : [];
+      list.forEach(jadwalItem => {
+        hasData = true;
+        const status = cj_getStatusJurnal(dateStr, selectedGuru, jadwalItem, usedTracker);
+        let icon;
+        if (status === "OK") icon = '<span class="text-emerald-600 font-bold">✅</span>';
+        else if (status === "LATE") icon = '<span class="text-red-500 font-bold">❌</span> <span style="font-size:9px;color:#f87171;">(Lewat Waktu)</span>';
+        else icon = '<span class="text-red-500 font-bold">❌</span>';
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td class="py-2 px-3 text-slate-600 font-mono">' + dateStr + '</td>'
+                     + '<td class="py-2 px-2 text-center font-bold text-slate-700">' + jadwalItem.kelas + '</td>'
+                     + '<td class="py-2 px-3 text-slate-600">' + jadwalItem.mapel + '</td>'
+                     + '<td class="py-2 px-2 text-center">' + icon + '</td>';
+        tbody.appendChild(tr);
+      });
+    }
+    if (!hasData) tbody.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-slate-400 italic">Tidak ada jadwal KBM untuk <b>' + selectedGuru + '</b> di bulan ini.</td></tr>';
+  }
+
+  function cj_startCountdown() {
+    if (cj_countdownTimer) return;
+    cj_countdownTimer = setInterval(() => {
+      const box = document.getElementById('cj_timeWarning');
+      if (!box) return;
+      const now = new Date();
+      const dow = now.getDay();
+      if (dow === 0 || dow === 5) { box.style.display = 'none'; return; }
+      box.style.display = 'block';
+      const target = new Date(); target.setHours(23, 0, 0, 0);
+      const diff = target - now;
+      if (diff <= 0) {
+        box.className = "bg-red-50 border border-red-200 text-red-700 text-xs font-semibold px-3 py-2 rounded-lg text-center shrink-0";
+        box.innerHTML = "Sudah Pkl. 23:00 WIB. Input jurnal KBM hari ini <strong>Ditutup</strong>.";
+      } else {
+        const h = String(Math.floor((diff / 3600000) % 24)).padStart(2, '0');
+        const mi = String(Math.floor((diff / 60000) % 60)).padStart(2, '0');
+        const s = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
+        box.className = "bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold px-3 py-2 rounded-lg text-center shrink-0";
+        box.innerHTML = "Sisa Waktu Input Jurnal: <strong>" + h + " Jam " + mi + " Menit " + s + " Detik</strong>";
+      }
+    }, 1000);
+  }
+
+  window.muatCekJurnal = function () {
+    const titleEl = document.getElementById('cj_title');
+    if (titleEl) {
+      const dow = new Date().getDay();
+      if (dow === 5) titleEl.textContent = "EVALUASI HARI KAMIS — Cek Jurnal KBM";
+      else if (dow === 0) titleEl.textContent = "EVALUASI HARI SABTU — Cek Jurnal KBM";
+      else titleEl.textContent = "Cek Kepatuhan Jurnal KBM";
+    }
+    const bulanSel = document.getElementById('cj_bulanSelect');
+    if (bulanSel && bulanSel.options.length === 0) {
+      const now = new Date();
+      const curVal = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, '0');
+      cj_bulanOptions().forEach(o => {
+        const opt = document.createElement('option'); opt.value = o.v; opt.textContent = o.label;
+        if (o.v === curVal) opt.selected = true;
+        bulanSel.appendChild(opt);
+      });
+    }
+    if (!window._cj_listenersBound) {
+      window._cj_listenersBound = true;
+      const gs = document.getElementById('cj_guruSelect');
+      const bs = document.getElementById('cj_bulanSelect');
+      if (gs) gs.addEventListener('change', cj_render);
+      if (bs) bs.addEventListener('change', () => { const g = document.getElementById('cj_guruSelect'); if (g && g.value) cj_render(); });
+    }
+    cj_startCountdown();
+    cj_fetchAndRender();
+  };
+  window.cj_muatUlang = cj_fetchAndRender;
 
 </script>
 
