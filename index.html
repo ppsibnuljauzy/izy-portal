@@ -448,6 +448,9 @@
             <button id="tabBtnCekInputNilai" onclick="pindahMenu('cekInputNilai')" class="nav-btn w-full text-left p-2 rounded-lg text-xs font-semibold text-teal-200 flex items-center gap-2">
               <i class="fa-solid fa-clipboard-check w-4 text-center"></i> Cek Input Nilai
             </button>
+            <button id="tabBtnCekJurnalInput" onclick="pindahMenu('cekJurnalInput')" class="nav-btn w-full text-left p-2 rounded-lg text-xs font-semibold text-teal-200 flex items-center gap-2">
+              <i class="fa-solid fa-list-check w-4 text-center"></i> Cek Jurnal Input
+            </button>
             <button id="tabBtnRekapPrestasi" onclick="pindahMenu('rekapPrestasi')" class="nav-btn w-full text-left p-2 rounded-lg text-xs font-semibold text-teal-200 flex items-center gap-2">
               <i class="fa-solid fa-trophy w-4 text-center"></i> Santri Berprestasi
             </button>
@@ -2083,6 +2086,52 @@
                     <div class="text-center py-12 text-teal-700 font-bold text-xs">
                       <i class="fa-solid fa-spinner fa-spin text-xl mb-2"></i><br>Memuat data dari server...
                     </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ========================================== -->
+          <!-- 11B. PANEL: CEK JURNAL INPUT (KEPATUHAN)   -->
+          <!-- ========================================== -->
+          <section id="panelCekJurnalInput" class="w-full hidden animate-[fadeIn_0.3s_ease-in-out]">
+            <div class="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden flex flex-col h-[calc(100vh-4.5rem)]">
+              <div class="bg-gradient-to-r from-teal-900 to-teal-700 px-5 py-2.5 flex justify-between items-center text-white shrink-0">
+                <div>
+                  <h2 class="text-xs font-black tracking-widest uppercase" id="cjiJudul">Cek Kepatuhan Jurnal KBM</h2>
+                  <p class="text-[9px] text-teal-100 font-medium">Monitoring kelengkapan &amp; ketepatan waktu input jurnal mengajar guru</p>
+                </div>
+                <button type="button" onclick="if(window.cjiRefresh)window.cjiRefresh()" class="bg-white/15 hover:bg-white text-white hover:text-teal-900 px-2.5 py-1 rounded text-[9px] uppercase font-bold tracking-wider transition flex items-center gap-1.5 shadow-sm">
+                  <i class="fa-solid fa-arrows-rotate"></i> Refresh
+                </button>
+              </div>
+
+              <div class="p-3 flex flex-col flex-1 overflow-hidden space-y-2.5 bg-slate-50/50">
+                <!-- Kotak Peringatan Waktu -->
+                <div id="cjiTimeWarning" class="shrink-0 bg-amber-50 border border-amber-200 text-amber-800 text-center text-[11px] font-semibold py-2 px-3 rounded-lg">
+                  Menghitung sisa waktu...
+                </div>
+
+                <!-- Filter Bulan & Guru -->
+                <div class="grid grid-cols-2 gap-2 shrink-0">
+                  <select id="cjiBulanSelect" class="w-full text-xs border border-slate-300 rounded-lg bg-white px-2.5 py-2 font-semibold text-slate-700 outline-none focus:border-teal-600 focus:ring-1 focus:ring-teal-600">
+                  </select>
+                  <select id="cjiGuruSelect" class="w-full text-xs border border-slate-300 rounded-lg bg-white px-2.5 py-2 font-semibold text-slate-700 outline-none focus:border-teal-600 focus:ring-1 focus:ring-teal-600">
+                    <option value="">-- Memuat data... --</option>
+                  </select>
+                </div>
+
+                <!-- Tabel Hasil -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden flex-1 flex flex-col bg-white shadow-sm">
+                  <div class="overflow-auto flex-1 h-0">
+                    <div id="cjiLoading" class="text-center py-12 text-teal-700 font-bold text-xs">
+                      <i class="fa-solid fa-spinner fa-spin text-xl mb-2"></i><br>Memuat data dari server...
+                    </div>
+                    <table id="cjiResultTable" class="w-full text-xs" style="table-layout: fixed; display: none;">
+                      <thead id="cjiTableHead" class="sticky top-0 z-10"></thead>
+                      <tbody id="cjiTableBody"></tbody>
+                    </table>
                   </div>
                 </div>
               </div>
@@ -3779,7 +3828,7 @@
       const panels = [
         'panelBeranda', 'panelInputSoal', 'panelDaftarSoal', 'panelSettingSoal',
         'panelSetoran', 'panelInputKbm', 'panelNilaiKbm', 'panelAbsenKbm', 'panelAbsenKst', 'panelAdab',
-        'panelRekapKbm', 'panelRekapTahfizh', 'panelRekapNilai', 'panelRekapAbsenKbm', 'panelRekapAdab', 'panelRekapKinerja', 'panelCekInputNilai', 'panelRekapPrestasi', 'panelProfilData', 'panelRosterMapel', 'panelRankingKelas', 'panelKlasemenAdab', 'panelRekapTasmi', 'panelInputTasmi', 'panelCapaianTahfizh', 'panelBelumSetoran', 'panelDownload', 'panelInbox', 'panelUjian', 'panelKontrolUjian', 'panelKaldik', 'panelDaftar'
+        'panelRekapKbm', 'panelRekapTahfizh', 'panelRekapNilai', 'panelRekapAbsenKbm', 'panelRekapAdab', 'panelRekapKinerja', 'panelCekInputNilai', 'panelCekJurnalInput', 'panelRekapPrestasi', 'panelProfilData', 'panelRosterMapel', 'panelRankingKelas', 'panelKlasemenAdab', 'panelRekapTasmi', 'panelInputTasmi', 'panelCapaianTahfizh', 'panelBelumSetoran', 'panelDownload', 'panelInbox', 'panelUjian', 'panelKontrolUjian', 'panelKaldik', 'panelDaftar'
       ];
       panels.forEach(p => {
         const el = document.getElementById(p);
@@ -3789,7 +3838,7 @@
       const tabs = [
         'tabBtnBeranda', 'tabBtnInputSoal', 'tabBtnDaftarSoal', 'tabBtnSettingSoal',
         'tabBtnSetoran', 'tabBtnInputKbm', 'tabBtnNilaiKbm', 'tabBtnAbsenKbm', 'tabBtnAbsenKst', 'tabBtnAdab',
-        'tabBtnRekapKbm', 'tabBtnRekapTahfizh', 'tabBtnRekapNilai', 'tabBtnRekapAbsenKbm', 'tabBtnRekapAdab', 'tabBtnRekapKinerja', 'tabBtnCekInputNilai', 'tabBtnRekapPrestasi', 'tabBtnProfilData', 'tabBtnRosterMapel', 'tabBtnRankingKelas', 'tabBtnKlasemenAdab', 'tabBtnRekapTasmi', 'tabBtnInputTasmi', 'tabBtnCapaianTahfizh', 'tabBtnBelumSetoran', 'tabBtnDownload', 'tabBtnInbox', 'tabBtnUjian', 'tabBtnKontrolUjian', 'tabBtnKaldik', 'tabBtnDaftar'
+        'tabBtnRekapKbm', 'tabBtnRekapTahfizh', 'tabBtnRekapNilai', 'tabBtnRekapAbsenKbm', 'tabBtnRekapAdab', 'tabBtnRekapKinerja', 'tabBtnCekInputNilai', 'tabBtnCekJurnalInput', 'tabBtnRekapPrestasi', 'tabBtnProfilData', 'tabBtnRosterMapel', 'tabBtnRankingKelas', 'tabBtnKlasemenAdab', 'tabBtnRekapTasmi', 'tabBtnInputTasmi', 'tabBtnCapaianTahfizh', 'tabBtnBelumSetoran', 'tabBtnDownload', 'tabBtnInbox', 'tabBtnUjian', 'tabBtnKontrolUjian', 'tabBtnKaldik', 'tabBtnDaftar'
       ];
       tabs.forEach(t => {
         const el = document.getElementById(t);
@@ -3920,6 +3969,12 @@
         titleEl.innerText = 'Cek Input Nilai';
         iconEl.className = 'fa-solid fa-clipboard-check text-teal-600 text-base';
         if (typeof window.loadMasterDataCekNilai === 'function' && window.masterDataGuruMapel.length === 0) window.loadMasterDataCekNilai();
+      } else if (menu === 'cekJurnalInput') {
+        document.getElementById('panelCekJurnalInput').classList.remove('hidden');
+        document.getElementById('tabBtnCekJurnalInput').classList.add('active');
+        titleEl.innerText = 'Cek Jurnal Input';
+        iconEl.className = 'fa-solid fa-list-check text-teal-600 text-base';
+        if (typeof window.cjiInit === 'function') window.cjiInit();
       } else if (menu === 'rekapPrestasi') {
         document.getElementById('panelRekapPrestasi').classList.remove('hidden');
         document.getElementById('tabBtnRekapPrestasi').classList.add('active');
@@ -4097,8 +4152,8 @@
     // (dbBiodata diakses via WORKER_PROXY — lihat apiGet/apiPush di atas)
     const dbSetoran = getDatabase(initializeApp({
       apiKey: "AIzaSyDfpXCyG-Cn7iw3e3EdBRnkzJ5gctUHOtk",
-      databaseURL: "https://data-setoran-hafalan-quran-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "data-setoran-hafalan-quran"
+      databaseURL: "https://data-setoran-bacaan-quran-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "data-setoran-bacaan-quran"
     }, "appSetoran"));
 
     // (dbJurnal diakses via WORKER_PROXY — lihat apiGet/apiPush di atas)
@@ -6445,7 +6500,7 @@
           const b = document.getElementById("btnSubmitSetoran");
           b.disabled = true; b.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
           try {
-            await set(push(ref(dbSetoran, 'setoran_hafalan')), dataSetoranSubmit);
+            await set(push(ref(dbSetoran, 'setoran_bacaan')), dataSetoranSubmit);
             Swal.fire('Alhamdulillah', 'Data bacaan santri berhasil disimpan!', 'success');
             document.getElementById("ayatAkhir").value = "";
             document.getElementById("nilai").value = "";
@@ -8406,7 +8461,7 @@
       loadRekapJurnalViaProxy();
       setInterval(loadRekapJurnalViaProxy, 5000);
 
-      onValue(ref(dbSetoran, "setoran_hafalan"), snap => {
+      onValue(ref(dbSetoran, "setoran_bacaan"), snap => {
         dataSetoranAll = [];
         snap.forEach(c => { dataSetoranAll.push({ ...c.val(), key: c.key }); });
         
@@ -9648,7 +9703,7 @@ let inboxSesiAktifNamaID = "";
 
   // ============================================================
   // CAPAIAN BEBAN TAHFIZH (lazy-load saat menu dibuka pertama kali)
-  // Sumber data: dbSetoran -> setoran_hafalan (sama dengan Rekap Setoran)
+  // Sumber data: dbSetoran -> setoran_bacaan (sama dengan Rekap Setoran)
   // ============================================================
   let capaianTahfizhTerisi = false;
   window.muatCapaianTahfizh = function () {
@@ -9941,7 +9996,7 @@ let inboxSesiAktifNamaID = "";
     });
 
     // --- Subscribe data setoran (live) ---
-    onValue(ref(dbSetoran, 'setoran_hafalan'), (snapshot) => {
+    onValue(ref(dbSetoran, 'setoran_bacaan'), (snapshot) => {
       const loadingArea = document.getElementById("ct_loadingArea");
       if (!snapshot.exists()) {
         loadingArea.innerHTML = "<div class='py-10 text-slate-500 text-xs'>Belum ada data setoran di database.</div>";
@@ -10011,7 +10066,7 @@ let inboxSesiAktifNamaID = "";
 
   // ============================================================
   // BELUM SETORAN TAHFIZH HARI INI (lazy-load saat menu dibuka)
-  // Gabungan: dbBiodata (identitas_santri per halaqoh) + dbSetoran (setoran_hafalan hari ini)
+  // Gabungan: dbBiodata (identitas_santri per halaqoh) + dbSetoran (setoran_bacaan hari ini)
   // ============================================================
   let belumSetoranTerisi = false;
   let bs_hariIndex = -1, bs_tgl = 0, bs_bln = "", bs_thn = 0;
@@ -10039,7 +10094,7 @@ let inboxSesiAktifNamaID = "";
       try {
         const [biodataSnap, setoranSnap] = await Promise.all([
           apiGet("biodata", "identitas_santri"),
-          get(query(ref(dbSetoran, 'setoran_hafalan')))
+          get(query(ref(dbSetoran, 'setoran_bacaan')))
         ]);
         container.innerHTML = "";
         let dataKelompok = {};
@@ -10769,6 +10824,388 @@ let inboxSesiAktifNamaID = "";
   } else {
     bindKbmJudulFilters();
   }
+})();
+</script>
+
+<!-- ============================================================ -->
+<!-- MODUL CEK JURNAL INPUT (KEPATUHAN JURNAL KBM GURU)           -->
+<!-- ============================================================ -->
+<script type="module">
+(function () {
+  const CJI_START_DATE = new Date("2026-07-14T00:00:00");
+  const CJI_NAMA_HARI = ["Ahad", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+  const NAMA_BULAN = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+
+  let cjiJadwalData = {};   // guru -> hari -> [{mapel, originalMapel, kelas, waktu}]
+  let cjiGuruList = new Set();
+  let cjiJurnalArray = [];
+  let cjiUsedTracker = new Set();
+  let cjiJurnalLoaded = false;
+  let cjiJadwalLoaded = false;
+  let cjiCountdownTimer = null;
+  let cjiInitialized = false;
+
+  // ---- Proxy helper (menggunakan WORKER_PROXY_URL yang sudah diekspos portal) ----
+  async function cjiApiGet(db, path) {
+    try {
+      const res = await fetch(window.WORKER_PROXY_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ db, action: "get", path: path || "", data: null, query: null, auth: null })
+      });
+      const r = await res.json();
+      return r.data;
+    } catch (e) { console.error("cjiApiGet error:", e); return null; }
+  }
+
+  // ---- Helper matching (sama persis dengan logika asli) ----
+  function cjiGetBlokWaktu(w) {
+    if (!w) return "";
+    if (w.includes("08.00") || w.includes("08.40")) return "1";
+    if (w.includes("09.35") || w.includes("10.15")) return "2";
+    if (w.includes("11.10") || w.includes("11.50")) return "3";
+    if (w.includes("13.30") || w.includes("14.10")) return "4";
+    return w;
+  }
+  function cjiCleanText(str) { return (str || "").toString().toLowerCase().replace(/[^a-z0-9]/g, ""); }
+  function cjiIsMatchFlexible(s1, s2) {
+    const a = cjiCleanText(s1), b = cjiCleanText(s2);
+    if (!a || !b) return false;
+    return a.includes(b) || b.includes(a);
+  }
+  function cjiIsMatchKelas(kj, kr) {
+    let j = (kj || "").toString().toLowerCase().trim();
+    let r = (kr || "").toString().toLowerCase().trim();
+    if (j === r) return true;
+    let nj = j.match(/\d+/), nr = r.match(/\d+/);
+    if (nj && nr && nj[0] !== nr[0]) return false;
+    if (nj && (nj[0] === "10" || nj[0] === "11" || nj[0] === "12")) return true;
+    let cj = j.replace(/\s+/g, ""), cr = r.replace(/\s+/g, "");
+    return cj.includes(cr) || cr.includes(cj);
+  }
+
+  // ---- Bangun struktur jadwal dari jam_mapel ----
+  function cjiBuildJadwalData(dataJam) {
+    cjiJadwalData = {};
+    cjiGuruList.clear();
+    if (!dataJam) return;
+    Object.values(dataJam).forEach(item => {
+      if (!item || !item.namaGuru) return;
+      const guruName = item.namaGuru;
+      const hari = item.hari;
+      const mapel = item.namaMapel || "-";
+      const kelas = item.kelas || "-";
+      const waktuBlok = cjiGetBlokWaktu(item.jamMasuk || "");
+      cjiGuruList.add(guruName);
+      if (!cjiJadwalData[guruName]) cjiJadwalData[guruName] = {};
+      if (!cjiJadwalData[guruName][hari]) cjiJadwalData[guruName][hari] = [];
+      const exists = cjiJadwalData[guruName][hari].find(x => x.originalMapel === mapel && x.kelas === kelas && x.waktu === waktuBlok);
+      if (!exists) {
+        cjiJadwalData[guruName][hari].push({ mapel, originalMapel: mapel, kelas, waktu: waktuBlok });
+      }
+    });
+    // Beri label sesi (1),(2) untuk mapel yang muncul >1 kali sehari
+    for (const guru in cjiJadwalData) {
+      for (const hari in cjiJadwalData[guru]) {
+        const frekuensi = {};
+        cjiJadwalData[guru][hari].forEach(j => {
+          const kunci = j.kelas + "_" + j.originalMapel;
+          frekuensi[kunci] = (frekuensi[kunci] || 0) + 1;
+        });
+        let sesiKe = 1;
+        cjiJadwalData[guru][hari].forEach(j => {
+          const kunci = j.kelas + "_" + j.originalMapel;
+          if (frekuensi[kunci] > 1) {
+            if (j.waktu) j.mapel = `${j.originalMapel} (${j.waktu})`;
+            else { j.mapel = `${j.originalMapel} (Sesi ${sesiKe})`; sesiKe++; }
+          }
+        });
+        cjiJadwalData[guru][hari].sort((a, b) => (a.waktu || "99").localeCompare(b.waktu || "99"));
+      }
+    }
+  }
+
+  // ---- Muat data jurnal via proxy ----
+  async function cjiLoadJurnal() {
+    const data = await cjiApiGet("jurnal", "jurnal");
+    cjiJurnalArray = [];
+    if (data) {
+      Object.values(data).forEach(item => {
+        if (!item || !item.guru || !item.tanggal) return;
+        cjiJurnalArray.push({
+          tanggal: item.tanggal,
+          guru: item.guru,
+          mapel: item.mapel || "",
+          kelas: item.kelas || "",
+          timestamp: item.timestamp || 0
+        });
+      });
+    }
+    cjiJurnalLoaded = true;
+  }
+
+  // ---- Tentukan status jurnal (OK / LATE / NONE) dengan sistem pengunci ----
+  function cjiGetStatus(targetDateStr, guruName, jadwalItem) {
+    const mapelTarget = jadwalItem.originalMapel || jadwalItem.mapel;
+    const idx = cjiJurnalArray.findIndex((jurnal, index) => {
+      if (cjiUsedTracker.has(index)) return false;
+      if (jurnal.tanggal !== targetDateStr) return false;
+      return cjiIsMatchFlexible(guruName, jurnal.guru)
+          && cjiIsMatchFlexible(mapelTarget, jurnal.mapel)
+          && cjiIsMatchKelas(jadwalItem.kelas, jurnal.kelas);
+    });
+    if (idx === -1) return "NONE";
+    cjiUsedTracker.add(idx);
+    const j = cjiJurnalArray[idx];
+    if (j.timestamp) {
+      const jam = new Date(j.timestamp).getHours();
+      if (jam >= 23 || jam < 8) return "LATE";
+    }
+    return "OK";
+  }
+
+  // ---- Isi dropdown bulan (dinamis dari Juli 2026 s/d bulan depan) ----
+  function cjiIsiBulan() {
+    const sel = document.getElementById("cjiBulanSelect");
+    if (!sel) return;
+    const now = new Date();
+    const curVal = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    sel.innerHTML = "";
+    const startM = 6, startY = 2026; // Juli 2026
+    const endM = now.getMonth() + 2, endY = now.getFullYear();
+    let y = startY, m = startM;
+    while (y < endY || (y === endY && m <= endM)) {
+      const val = `${y}-${String(m + 1).padStart(2, "0")}`;
+      const opt = document.createElement("option");
+      opt.value = val;
+      opt.textContent = `${NAMA_BULAN[m]} ${y}`;
+      if (val === curVal) opt.selected = true;
+      sel.appendChild(opt);
+      m++;
+      if (m > 11) { m = 0; y++; }
+    }
+  }
+
+  function cjiUpdateGuruDropdown() {
+    const sel = document.getElementById("cjiGuruSelect");
+    if (!sel) return;
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">-- Semua Guru (Ringkasan Harian) --</option>';
+    Array.from(cjiGuruList).sort().forEach(g => {
+      const o = document.createElement("option");
+      o.value = g; o.textContent = g;
+      sel.appendChild(o);
+    });
+    if (cur) sel.value = cur;
+  }
+
+  function cjiSetJudul() {
+    const el = document.getElementById("cjiJudul");
+    if (!el) return;
+    const dow = new Date().getDay();
+    if (dow === 5) el.textContent = "EVALUASI HARI KAMIS";
+    else if (dow === 0) el.textContent = "EVALUASI HARI SABTU";
+    else el.textContent = "CEK KEPATUHAN JURNAL KBM";
+  }
+
+  function cjiRender() {
+    const guru = (document.getElementById("cjiGuruSelect") || {}).value;
+    if (!guru) cjiRenderRingkasan(); else cjiRenderTable();
+  }
+
+  // ---- Mode: Ringkasan harian (guru belum dipilih) ----
+  function cjiRenderRingkasan() {
+    cjiUsedTracker.clear();
+    const head = document.getElementById("cjiTableHead");
+    const body = document.getElementById("cjiTableBody");
+    if (!head || !body) return;
+    body.innerHTML = "";
+
+    const now = new Date();
+    let targetDate = new Date();
+    const dayOfWeek = now.getDay();
+    if (dayOfWeek === 5 || dayOfWeek === 0) targetDate.setDate(targetDate.getDate() - 1);
+
+    head.innerHTML = `
+      <tr style="background:#00897b;color:#fff;">
+        <th style="width:35%;padding:8px 6px;text-align:left;font-size:11px;text-transform:uppercase;">Nama Guru</th>
+        <th style="width:15%;padding:8px 6px;text-align:center;font-size:11px;text-transform:uppercase;">Kelas</th>
+        <th style="width:35%;padding:8px 6px;text-align:left;font-size:11px;text-transform:uppercase;">Mata Pelajaran</th>
+        <th style="width:15%;padding:8px 6px;text-align:center;font-size:11px;text-transform:uppercase;">Status</th>
+      </tr>`;
+
+    const y = targetDate.getFullYear();
+    const mo = String(targetDate.getMonth() + 1).padStart(2, "0");
+    const d = String(targetDate.getDate()).padStart(2, "0");
+    const targetDateStr = `${y}-${mo}-${d}`;
+    const targetDayName = CJI_NAMA_HARI[targetDate.getDay()];
+
+    let hasData = false;
+    const sortedGurus = Array.from(cjiGuruList).sort();
+    sortedGurus.forEach(guru => {
+      const jadwalTarget = (cjiJadwalData[guru] && cjiJadwalData[guru][targetDayName]) ? cjiJadwalData[guru][targetDayName] : [];
+      jadwalTarget.forEach(jadwalItem => {
+        const status = cjiGetStatus(targetDateStr, guru, jadwalItem);
+        if (status === "NONE" || status === "LATE") {
+          hasData = true;
+          const label = status === "LATE"
+            ? "❌<div style='font-size:9px;font-weight:normal;color:#dc2626;'>Lewat 23:00</div>"
+            : "❌";
+          const tr = document.createElement("tr");
+          tr.style.borderBottom = "1px solid #f1f5f9";
+          tr.innerHTML = `
+            <td style="padding:8px 6px;"><strong>${guru}</strong></td>
+            <td style="padding:8px 6px;text-align:center;">${jadwalItem.kelas}</td>
+            <td style="padding:8px 6px;">${jadwalItem.mapel}</td>
+            <td style="padding:8px 6px;text-align:center;font-size:16px;font-weight:bold;color:#dc2626;">${label}</td>`;
+          body.appendChild(tr);
+        }
+      });
+    });
+
+    if (!hasData) {
+      let msg = "Hebat! Hari ini semua guru sudah melengkapi jurnal. 🎉";
+      if (dayOfWeek === 5) msg = "Laporan hari Kamis, sebagai evaluasi bagi guru. Semua sudah lengkap. 🎉";
+      else if (dayOfWeek === 0) msg = "Laporan hari Sabtu, sebagai evaluasi bagi guru. Semua sudah lengkap. 🎉";
+      body.innerHTML = `<tr><td colspan="4" style="padding:20px;text-align:center;color:#94a3b8;font-style:italic;">${msg}</td></tr>`;
+    }
+  }
+
+  // ---- Mode: Tabel per guru per bulan ----
+  function cjiRenderTable() {
+    cjiUsedTracker.clear();
+    const head = document.getElementById("cjiTableHead");
+    const body = document.getElementById("cjiTableBody");
+    if (!head || !body) return;
+    body.innerHTML = "";
+
+    head.innerHTML = `
+      <tr style="background:#00897b;color:#fff;">
+        <th style="width:24%;padding:8px 6px;text-align:left;font-size:11px;text-transform:uppercase;">Tanggal</th>
+        <th style="width:16%;padding:8px 6px;text-align:center;font-size:11px;text-transform:uppercase;">Kelas</th>
+        <th style="width:45%;padding:8px 6px;text-align:left;font-size:11px;text-transform:uppercase;">Mata Pelajaran</th>
+        <th style="width:15%;padding:8px 6px;text-align:center;font-size:11px;text-transform:uppercase;">Status</th>
+      </tr>`;
+
+    const selectedBulan = (document.getElementById("cjiBulanSelect") || {}).value;
+    const selectedGuru = (document.getElementById("cjiGuruSelect") || {}).value;
+    if (!selectedBulan || !selectedGuru) return;
+
+    const [year, month] = selectedBulan.split("-");
+    const daysInMonth = new Date(year, month, 0).getDate();
+    let hasData = false;
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = `${year}-${month}-${String(d).padStart(2, "0")}`;
+      const currentDate = new Date(`${dateStr}T00:00:00`);
+      if (currentDate < CJI_START_DATE) continue;
+      const hariName = CJI_NAMA_HARI[currentDate.getDay()];
+      const jadwalHariIni = (cjiJadwalData[selectedGuru] && cjiJadwalData[selectedGuru][hariName]) ? cjiJadwalData[selectedGuru][hariName] : [];
+      if (jadwalHariIni.length > 0) {
+        jadwalHariIni.forEach(jadwalItem => {
+          hasData = true;
+          const status = cjiGetStatus(dateStr, selectedGuru, jadwalItem);
+          let iconHTML = "";
+          if (status === "OK") {
+            iconHTML = `<td style="padding:8px 6px;text-align:center;font-size:16px;font-weight:bold;color:#16a34a;">✅</td>`;
+          } else if (status === "LATE") {
+            iconHTML = `<td style="padding:8px 6px;text-align:center;font-size:16px;font-weight:bold;color:#dc2626;line-height:1;">❌<br><span style="font-size:9px;font-weight:normal;">(Lewat Waktu)</span></td>`;
+          } else {
+            iconHTML = `<td style="padding:8px 6px;text-align:center;font-size:16px;font-weight:bold;color:#dc2626;">❌</td>`;
+          }
+          const tr = document.createElement("tr");
+          tr.style.borderBottom = "1px solid #f1f5f9";
+          tr.innerHTML = `
+            <td style="padding:8px 6px;">${dateStr}</td>
+            <td style="padding:8px 6px;text-align:center;"><strong>${jadwalItem.kelas}</strong></td>
+            <td style="padding:8px 6px;">${jadwalItem.mapel}</td>
+            ${iconHTML}`;
+          body.appendChild(tr);
+        });
+      }
+    }
+
+    if (!hasData) {
+      body.innerHTML = `<tr><td colspan="4" style="padding:20px;text-align:center;color:#94a3b8;font-style:italic;">Tidak ada jadwal KBM untuk <b>${selectedGuru}</b> di bulan ini.</td></tr>`;
+    }
+  }
+
+  // ---- Countdown sisa waktu input ----
+  function cjiStartCountdown() {
+    if (cjiCountdownTimer) clearInterval(cjiCountdownTimer);
+    const box = document.getElementById("cjiTimeWarning");
+    if (!box) return;
+    cjiCountdownTimer = setInterval(() => {
+      const now = new Date();
+      const dow = now.getDay();
+      if (dow === 0 || dow === 5) { box.style.display = "none"; return; }
+      box.style.display = "block";
+      const target = new Date(); target.setHours(23, 0, 0, 0);
+      const diff = target - now;
+      if (diff <= 0) {
+        box.className = "shrink-0 bg-rose-50 border border-rose-200 text-rose-700 text-center text-[11px] font-semibold py-2 px-3 rounded-lg";
+        box.innerHTML = "Sudah Pkl. 23:00 WIB. Input jurnal KBM hari ini <strong>Ditutup</strong>.";
+      } else {
+        const h = String(Math.floor((diff / 3600000) % 24)).padStart(2, "0");
+        const m = String(Math.floor((diff / 60000) % 60)).padStart(2, "0");
+        const s = String(Math.floor((diff / 1000) % 60)).padStart(2, "0");
+        box.className = "shrink-0 bg-amber-50 border border-amber-200 text-amber-800 text-center text-[11px] font-semibold py-2 px-3 rounded-lg";
+        box.innerHTML = `Sisa Waktu Input Jurnal: <strong>${h} Jam ${m} Menit ${s} Detik</strong>`;
+      }
+    }, 1000);
+  }
+
+  // ---- Inisialisasi (dipanggil saat tab dibuka) ----
+  async function cjiInit() {
+    cjiSetJudul();
+    cjiIsiBulan();
+    cjiStartCountdown();
+
+    const loading = document.getElementById("cjiLoading");
+    const table = document.getElementById("cjiResultTable");
+
+    if (!cjiJadwalLoaded) {
+      const dataJam = await cjiApiGet("biodata", "jam_mapel");
+      cjiBuildJadwalData(dataJam);
+      cjiJadwalLoaded = true;
+    }
+    cjiUpdateGuruDropdown();
+
+    if (!cjiJurnalLoaded) {
+      await cjiLoadJurnal();
+    }
+
+    if (loading) loading.style.display = "none";
+    if (table) table.style.display = "table";
+    cjiRender();
+  }
+
+  async function cjiRefresh() {
+    cjiJurnalLoaded = false;
+    const loading = document.getElementById("cjiLoading");
+    const table = document.getElementById("cjiResultTable");
+    if (loading) { loading.style.display = "block"; loading.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xl mb-2"></i><br>Memuat data dari server...'; }
+    if (table) table.style.display = "none";
+    await cjiLoadJurnal();
+    if (loading) loading.style.display = "none";
+    if (table) table.style.display = "table";
+    cjiRender();
+  }
+
+  // Bind event perubahan dropdown
+  function cjiBindEvents() {
+    if (cjiInitialized) return;
+    cjiInitialized = true;
+    const guruSel = document.getElementById("cjiGuruSelect");
+    const bulanSel = document.getElementById("cjiBulanSelect");
+    if (guruSel) guruSel.addEventListener("change", () => { if (cjiJurnalLoaded) cjiRender(); });
+    if (bulanSel) bulanSel.addEventListener("change", () => {
+      if (guruSel && guruSel.value && cjiJurnalLoaded) cjiRender();
+    });
+  }
+
+  window.cjiInit = function () { cjiBindEvents(); cjiInit(); };
+  window.cjiRefresh = function () { cjiRefresh(); };
 })();
 </script>
 </body>
