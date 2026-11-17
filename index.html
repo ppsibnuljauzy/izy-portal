@@ -4097,8 +4097,8 @@
     // (dbBiodata diakses via WORKER_PROXY — lihat apiGet/apiPush di atas)
     const dbSetoran = getDatabase(initializeApp({
       apiKey: "AIzaSyDfpXCyG-Cn7iw3e3EdBRnkzJ5gctUHOtk",
-      databaseURL: "https://data-setoran-bacaan-quran-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "data-setoran-bacaan-quran"
+      databaseURL: "https://data-setoran-hafalan-quran-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "data-setoran-hafalan-quran"
     }, "appSetoran"));
 
     // (dbJurnal diakses via WORKER_PROXY — lihat apiGet/apiPush di atas)
@@ -6445,7 +6445,7 @@
           const b = document.getElementById("btnSubmitSetoran");
           b.disabled = true; b.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
           try {
-            await set(push(ref(dbSetoran, 'setoran_bacaan')), dataSetoranSubmit);
+            await set(push(ref(dbSetoran, 'setoran_hafalan')), dataSetoranSubmit);
             Swal.fire('Alhamdulillah', 'Data bacaan santri berhasil disimpan!', 'success');
             document.getElementById("ayatAkhir").value = "";
             document.getElementById("nilai").value = "";
@@ -8406,7 +8406,7 @@
       loadRekapJurnalViaProxy();
       setInterval(loadRekapJurnalViaProxy, 5000);
 
-      onValue(ref(dbSetoran, "setoran_bacaan"), snap => {
+      onValue(ref(dbSetoran, "setoran_hafalan"), snap => {
         dataSetoranAll = [];
         snap.forEach(c => { dataSetoranAll.push({ ...c.val(), key: c.key }); });
         
@@ -9648,7 +9648,7 @@ let inboxSesiAktifNamaID = "";
 
   // ============================================================
   // CAPAIAN BEBAN TAHFIZH (lazy-load saat menu dibuka pertama kali)
-  // Sumber data: dbSetoran -> setoran_bacaan (sama dengan Rekap Setoran)
+  // Sumber data: dbSetoran -> setoran_hafalan (sama dengan Rekap Setoran)
   // ============================================================
   let capaianTahfizhTerisi = false;
   window.muatCapaianTahfizh = function () {
@@ -9941,7 +9941,7 @@ let inboxSesiAktifNamaID = "";
     });
 
     // --- Subscribe data setoran (live) ---
-    onValue(ref(dbSetoran, 'setoran_bacaan'), (snapshot) => {
+    onValue(ref(dbSetoran, 'setoran_hafalan'), (snapshot) => {
       const loadingArea = document.getElementById("ct_loadingArea");
       if (!snapshot.exists()) {
         loadingArea.innerHTML = "<div class='py-10 text-slate-500 text-xs'>Belum ada data setoran di database.</div>";
@@ -10011,7 +10011,7 @@ let inboxSesiAktifNamaID = "";
 
   // ============================================================
   // BELUM SETORAN TAHFIZH HARI INI (lazy-load saat menu dibuka)
-  // Gabungan: dbBiodata (identitas_santri per halaqoh) + dbSetoran (setoran_bacaan hari ini)
+  // Gabungan: dbBiodata (identitas_santri per halaqoh) + dbSetoran (setoran_hafalan hari ini)
   // ============================================================
   let belumSetoranTerisi = false;
   let bs_hariIndex = -1, bs_tgl = 0, bs_bln = "", bs_thn = 0;
@@ -10039,7 +10039,7 @@ let inboxSesiAktifNamaID = "";
       try {
         const [biodataSnap, setoranSnap] = await Promise.all([
           apiGet("biodata", "identitas_santri"),
-          get(query(ref(dbSetoran, 'setoran_bacaan')))
+          get(query(ref(dbSetoran, 'setoran_hafalan')))
         ]);
         container.innerHTML = "";
         let dataKelompok = {};
